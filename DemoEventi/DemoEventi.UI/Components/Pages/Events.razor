@@ -1,0 +1,45 @@
+﻿@page "/events"
+@inject IEventService EventService
+@using DemoEventi.Application.DTOs
+@using DemoEventi.Application.Interfaces
+
+<h3>Gestione Eventi</h3>
+
+<EventForm OnSaved="LoadEvents" />
+
+@if (events is null)
+{
+    <p><em>Caricamento...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr><th>Nome</th><th>Luogo</th><th>Data Inizio</th></tr>
+        </thead>
+        <tbody>
+        @foreach (var e in events)
+        {
+            <tr>
+                <td>@e.Name</td>
+                <td>@e.Location</td>
+                <td>@e.StartDate.ToShortDateString()</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<EventDto> events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEvents();
+    }
+
+    private async Task LoadEvents()
+    {
+        events = await EventService.GetAllAsync();
+    }
+}

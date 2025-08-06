@@ -1,0 +1,31 @@
+﻿using DemoEventi.Domain.Interfaces;
+using DemoEventi.Infrastructure.Data;
+using DemoEventi.Infrastructure.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DemoEventi.Infrastructure.UnitOfWork;
+
+public class EfUnitOfWork : IUnitOfWork
+{
+    private readonly AppDbContext _context;
+
+    public IUserRepository Users { get; }
+    public IEventRepository Events { get; }
+
+    public EfUnitOfWork(AppDbContext context)
+    {
+        _context = context;
+        Users = new UserRepository(context);
+        Events = new EventRepository(context);
+    }
+
+    public async Task<int> CommitAsync()
+        => await _context.SaveChangesAsync();
+
+    public void Dispose()
+        => _context.Dispose();
+}
