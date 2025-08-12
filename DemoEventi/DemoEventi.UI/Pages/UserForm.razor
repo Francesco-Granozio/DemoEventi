@@ -1,0 +1,247 @@
+@page "/userform"
+@page "/userform/{UserId:guid}"
+@using DemoEventi.Application.Interfaces
+@using DemoEventi.Application.DTOs
+@using DemoEventi.Application.Common
+@using DemoEventi.Domain.Entities
+@using System.ComponentModel.DataAnnotations
+@inject IUserService UserService
+@inject NavigationManager Navigation
+
+<PageTitle>@(isEdit ? "Edit" : "Create") User - DemoEventi</PageTitle>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>@(isEdit ? "Edit" : "Create") User</h2>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            @errorMessage
+                        </div>
+                    }
+
+                    <EditForm Model="@userModel" OnValidSubmit="HandleValidSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <InputText id="firstName" class="form-control" 
+                                     @bind-value="userModel.FirstName" />
+                            <ValidationMessage For="@(() => userModel.FirstName)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <InputText id="lastName" class="form-control" 
+                                     @bind-value="userModel.LastName" />
+                            <ValidationMessage For="@(() => userModel.LastName)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Interests</label>
+                            <div class="row">
+                                @if (availableInterests != null)
+                                {
+                                    @foreach (var interest in availableInterests)
+                                    {
+                                        <div class="col-md-6 mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" 
+                                                       id="interest-@interest.Id" 
+                                                       checked="@IsInterestSelected(interest.Id)"
+                                                       @onchange="@(e => ToggleInterest(interest.Id, e.Value))" />
+                                                <label class="form-check-label" for="interest-@interest.Id">
+                                                    @interest.Name
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-12">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Loading interests...</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                }
+                                @(isEdit ? "Update" : "Create") User
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Guid? UserId { get; set; }
+
+    private bool isEdit => UserId.HasValue;
+    private bool isSubmitting = false;
+    private string? errorMessage;
+    private IEnumerable<Interest>? availableInterests;
+    private UserFormModel userModel = new();
+    private HashSet<Guid> selectedInterestIds = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInterests();
+        
+        if (isEdit)
+        {
+            await LoadUser();
+        }
+    }
+
+    private async Task LoadInterests()
+    {
+        try
+        {
+            // TODO: Create IInterestService or add method to existing service
+            // availableInterests = await InterestService.GetAllAsync();
+            
+            // For now, create some sample interests
+            availableInterests = new List<Interest>
+            {
+                new() { Id = Guid.NewGuid(), Name = "Technology", Description = "Tech and programming" },
+                new() { Id = Guid.NewGuid(), Name = "Sports", Description = "Physical activities" },
+                new() { Id = Guid.NewGuid(), Name = "Music", Description = "Musical interests" },
+                new() { Id = Guid.NewGuid(), Name = "Travel", Description = "Travel and exploration" },
+                new() { Id = Guid.NewGuid(), Name = "Cooking", Description = "Culinary arts" }
+            };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading interests: {ex.Message}";
+        }
+    }
+
+    private async Task LoadUser()
+    {
+        try
+        {
+            var result = await UserService.GetByIdAsync(UserId.Value);
+            if (result.IsSuccess)
+            {
+                var user = result.Value;
+                userModel = new UserFormModel
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName
+                };
+                selectedInterestIds = user.InterestIds?.ToHashSet() ?? new HashSet<Guid>();
+            }
+            else
+            {
+                errorMessage = result.Error;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading user: {ex.Message}";
+        }
+    }
+
+    private bool IsInterestSelected(Guid interestId)
+    {
+        return selectedInterestIds.Contains(interestId);
+    }
+
+    private void ToggleInterest(Guid interestId, object? isChecked)
+    {
+        if (isChecked is bool checkedValue)
+        {
+            if (checkedValue)
+                selectedInterestIds.Add(interestId);
+            else
+                selectedInterestIds.Remove(interestId);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+        
+        try
+        {
+            var createUserDto = new CreateUserDto
+            {
+                FirstName = userModel.FirstName,
+                LastName = userModel.LastName,
+                InterestIds = selectedInterestIds
+            };
+
+            Result<UserDto> result;
+            if (isEdit)
+            {
+                result = await UserService.UpdateAsync(UserId.Value, createUserDto);
+            }
+            else
+            {
+                result = await UserService.CreateAsync(createUserDto);
+            }
+
+            if (result.IsSuccess)
+            {
+                Navigation.NavigateTo("users");
+            }
+            else
+            {
+                if (result.ValidationErrors.Any())
+                {
+                    errorMessage = string.Join(", ", result.ValidationErrors);
+                }
+                else
+                {
+                    errorMessage = result.Error;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error saving user: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("users");
+    }
+
+    public class UserFormModel
+    {
+        [Required(ErrorMessage = "First name is required")]
+        [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters")]
+        public string FirstName { get; set; } = "";
+
+        [Required(ErrorMessage = "Last name is required")]
+        [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
+        public string LastName { get; set; } = "";
+    }
+}

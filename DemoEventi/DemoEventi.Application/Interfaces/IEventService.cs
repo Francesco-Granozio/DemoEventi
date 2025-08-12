@@ -1,14 +1,14 @@
-﻿using DemoEventi.Application.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DemoEventi.Application.Common;
+using DemoEventi.Application.DTOs;
 
 namespace DemoEventi.Application.Interfaces;
+
 public interface IEventService
 {
-    Task<EventDto> CreateAsync(CreateEventDto dto);
-    Task<IEnumerable<EventDto>> GetAllAsync();
-    // ulteriori metodi come GetById, Update, Delete...
+    Task<Result<EventDto>> CreateAsync(CreateEventDto dto);
+    Task<Result<IEnumerable<EventDto>>> GetAllAsync();
+    Task<Result<EventDto>> GetByIdAsync(Guid id);
+    Task<Result<EventDto>> UpdateAsync(Guid id, CreateEventDto dto);
+    Task<Result> DeleteAsync(Guid id);
+    Task<Result> AddParticipantsAsync(Guid eventId, IEnumerable<Guid> userIds);
 }

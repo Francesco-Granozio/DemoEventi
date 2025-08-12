@@ -1,0 +1,67 @@
+using DemoEventi.Application.Interfaces;
+using DemoEventi.Application.Services;
+using DemoEventi.Application.Validators;
+using DemoEventi.Application.Common.Behaviors;
+using DemoEventi.Infrastructure.Extensions;
+using FluentValidation;
+using MediatR;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+// TODO: Add Swagger when package is installed
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "DemoEventi API", Version = "v1" });
+});
+
+// CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMauiBlazor", policy =>
+    {
+        policy.WithOrigins("http://localhost:5000", "https://localhost:5001")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// Infrastructure layer
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// Application layer
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+// FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
+
+// MediatR Pipeline Behaviors
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+// Application services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEventService, EventService>();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseCors("AllowMauiBlazor");
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();

@@ -61,12 +61,15 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="15.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.8" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\DemoEventi.Domain\DemoEventi.Domain.csproj" />
       <ProjectReference Include="..\DemoEventi.Application\DemoEventi.Application.csproj" />
       <ProjectReference Include="..\DemoEventi.Infrastructure\DemoEventi.Infrastructure.csproj" />
     </ItemGroup>

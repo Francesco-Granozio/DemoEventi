@@ -1,0 +1,141 @@
+@page "/users"
+@using DemoEventi.Application.Interfaces
+@using DemoEventi.Application.DTOs
+@using DemoEventi.Application.Common
+@inject IUserService UserService
+@inject NavigationManager Navigation
+
+<PageTitle>Users - DemoEventi</PageTitle>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Users</h1>
+                <button class="btn btn-primary" @onclick="CreateNewUser">
+                    <span class="oi oi-plus"></span> Create User
+                </button>
+            </div>
+
+            @if (users == null)
+            {
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else if (!users.Any())
+            {
+                <div class="alert alert-info">
+                    No users found. <a href="userform" class="alert-link">Create the first user</a>.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Interests</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in users)
+                            {
+                                <tr>
+                                    <td>@user.FirstName @user.LastName</td>
+                                    <td>
+                                        @if (user.InterestIds?.Any() == true)
+                                        {
+                                            <span class="badge bg-secondary me-1">@user.InterestIds.Count() interests</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No interests</span>
+                                        }
+                                    </td>
+                                    <td>@user.Id.ToString("N")[..8]...</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => EditUser(user.Id)">
+                                            <span class="oi oi-pencil"></span> Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteUser(user.Id)">
+                                            <span class="oi oi-trash"></span> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private IEnumerable<UserDto>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        try
+        {
+            var result = await UserService.GetAllAsync();
+            if (result.IsSuccess)
+            {
+                users = result.Value;
+            }
+            else
+            {
+                // In a real app, you'd want proper error handling
+                Console.WriteLine($"Error loading users: {result.Error}");
+                users = new List<UserDto>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading users: {ex.Message}");
+            users = new List<UserDto>();
+        }
+    }
+
+    private void CreateNewUser()
+    {
+        Navigation.NavigateTo("userform");
+    }
+
+    private void EditUser(Guid userId)
+    {
+        Navigation.NavigateTo($"userform/{userId}");
+    }
+
+    private async Task DeleteUser(Guid userId)
+    {
+        try
+        {
+            var result = await UserService.DeleteAsync(userId);
+            if (result.IsSuccess)
+            {
+                await LoadUsers();
+            }
+            else
+            {
+                // In a real app, you'd want proper error handling
+                Console.WriteLine($"Error deleting user: {result.Error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting user: {ex.Message}");
+        }
+    }
+}

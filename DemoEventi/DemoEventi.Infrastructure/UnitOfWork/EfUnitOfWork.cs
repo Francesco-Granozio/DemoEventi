@@ -1,11 +1,6 @@
 ﻿using DemoEventi.Domain.Interfaces;
 using DemoEventi.Infrastructure.Data;
 using DemoEventi.Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DemoEventi.Infrastructure.UnitOfWork;
 
