@@ -4,5 +4,5 @@ namespace DemoEventi.Domain.Interfaces;
 
 public interface IUserRepository : IRepository<User>
 {
-    // Additional user-specific methods can be declared here
+    Task<IEnumerable<User>> GetByIdsAsync(IEnumerable<Guid> ids);
 }

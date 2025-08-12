@@ -14,12 +14,14 @@ public class UserService : IUserService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IValidator<CreateUserDto> _validator;
+    private readonly IInterestRepository _interestRepository;
 
-    public UserService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<CreateUserDto> validator)
+    public UserService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<CreateUserDto> validator, IInterestRepository interestRepository)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _validator = validator;
+        _interestRepository = interestRepository;
     }
 
     public async Task<Result<UserDto>> CreateAsync(CreateUserDto dto)
@@ -36,6 +38,13 @@ public class UserService : IUserService
 
             var user = _mapper.Map<User>(dto);
             user.DataOraCreazione = DateTime.UtcNow;
+
+            // Handle interests if provided
+            if (dto.InterestIds != null && dto.InterestIds.Any())
+            {
+                var interests = await _interestRepository.GetByIdsAsync(dto.InterestIds);
+                user.Interests = interests.ToList();
+            }
 
             await _unitOfWork.Users.AddAsync(user);
             await _unitOfWork.CommitAsync();
@@ -107,8 +116,16 @@ public class UserService : IUserService
             existingUser.LastName = dto.LastName;
             existingUser.DataOraModifica = DateTime.UtcNow;
 
-            // TODO: Handle interests update
-            // existingUser.Interests = await _unitOfWork.Interests.GetByIdsAsync(dto.InterestIds);
+            // Handle interests update
+            if (dto.InterestIds != null)
+            {
+                var interests = await _interestRepository.GetByIdsAsync(dto.InterestIds);
+                existingUser.Interests = interests.ToList();
+            }
+            else
+            {
+                existingUser.Interests.Clear();
+            }
 
             _unitOfWork.Users.Update(existingUser);
             await _unitOfWork.CommitAsync();

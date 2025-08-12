@@ -14,12 +14,14 @@ public class EventService : IEventService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IValidator<CreateEventDto> _validator;
+    private readonly IUserRepository _userRepository;
 
-    public EventService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<CreateEventDto> validator)
+    public EventService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<CreateEventDto> validator, IUserRepository userRepository)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _validator = validator;
+        _userRepository = userRepository;
     }
 
     public async Task<Result<EventDto>> CreateAsync(CreateEventDto dto)
@@ -36,6 +38,13 @@ public class EventService : IEventService
 
             var ev = _mapper.Map<Event>(dto);
             ev.DataOraCreazione = DateTime.UtcNow;
+
+            // Handle participants if provided
+            if (dto.ParticipantIds != null && dto.ParticipantIds.Any())
+            {
+                var participants = await _userRepository.GetByIdsAsync(dto.ParticipantIds);
+                ev.Participants = participants.ToList();
+            }
 
             await _unitOfWork.Events.AddAsync(ev);
             await _unitOfWork.CommitAsync();
@@ -108,8 +117,16 @@ public class EventService : IEventService
             existingEvent.StartDate = dto.StartDate;
             existingEvent.DataOraModifica = DateTime.UtcNow;
 
-            // TODO: Handle participants update
-            // existingEvent.Participants = await _unitOfWork.Users.GetByIdsAsync(dto.ParticipantIds);
+            // Handle participants update
+            if (dto.ParticipantIds != null)
+            {
+                var participants = await _userRepository.GetByIdsAsync(dto.ParticipantIds);
+                existingEvent.Participants = participants.ToList();
+            }
+            else
+            {
+                existingEvent.Participants.Clear();
+            }
 
             _unitOfWork.Events.Update(existingEvent);
             await _unitOfWork.CommitAsync();
@@ -154,12 +171,14 @@ public class EventService : IEventService
                 return Result.Failure("Event not found");
             }
 
-            // TODO: Implement participant addition logic
-            // var users = await _unitOfWork.Users.GetByIdsAsync(userIds);
-            // foreach (var user in users)
-            // {
-            //     ev.Participants.Add(user);
-            // }
+            var users = await _userRepository.GetByIdsAsync(userIds);
+            foreach (var user in users)
+            {
+                if (!ev.Participants.Any(p => p.Id == user.Id))
+                {
+                    ev.Participants.Add(user);
+                }
+            }
 
             await _unitOfWork.CommitAsync();
             return Result.Success();

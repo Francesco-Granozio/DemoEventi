@@ -2,7 +2,9 @@ using DemoEventi.Application.Interfaces;
 using DemoEventi.Application.Services;
 using DemoEventi.Application.Validators;
 using DemoEventi.Application.Common.Behaviors;
+using DemoEventi.Application.Mapping;
 using DemoEventi.Infrastructure.Extensions;
+using DemoEventi.Infrastructure.Data;
 using FluentValidation;
 using MediatR;
 
@@ -34,7 +36,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Application layer
-builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(MappingProfile).Assembly));
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 // FluentValidation
@@ -48,6 +50,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEventService, EventService>();
 
 var app = builder.Build();
+
+// Seed the database with mock data
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DataSeeder.SeedAsync(context);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
