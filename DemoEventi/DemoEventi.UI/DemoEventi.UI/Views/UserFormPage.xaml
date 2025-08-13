@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="DemoEventi.UI.Views.UserFormPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding PageTitle}">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20">
+
+            <!-- Error Message -->
+            <Frame IsVisible="{Binding HasError}"
+                   BackgroundColor="Red"
+                   Padding="10">
+                <Label Text="{Binding ErrorMessage}" 
+                       TextColor="White"
+                       HorizontalOptions="Center" />
+            </Frame>
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                              IsVisible="{Binding IsBusy}"
+                              HorizontalOptions="Center" />
+
+            <!-- Form Content -->
+            <VerticalStackLayout IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                                 Spacing="15">
+
+                <!-- First Name -->
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="First Name" FontAttributes="Bold" />
+                    <Entry Text="{Binding FirstName}" 
+                           Placeholder="Enter first name" />
+                </VerticalStackLayout>
+
+                <!-- Last Name -->
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Last Name" FontAttributes="Bold" />
+                    <Entry Text="{Binding LastName}" 
+                           Placeholder="Enter last name" />
+                </VerticalStackLayout>
+
+                <!-- Interests -->
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Interests" FontAttributes="Bold" />
+                    <Frame Padding="10" BackgroundColor="LightGray">
+                        <CollectionView ItemsSource="{Binding AvailableInterests}"
+                                       HeightRequest="200">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="Auto,*" Padding="5">
+                                        <CheckBox Grid.Column="0" 
+                                                  IsChecked="{Binding IsSelected}"
+                                                  VerticalOptions="Center" />
+                                        <Label Grid.Column="1" 
+                                               Text="{Binding Name}"
+                                               VerticalOptions="Center"
+                                               Margin="10,0,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Frame>
+                </VerticalStackLayout>
+
+                <!-- Buttons -->
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <Button Text="{Binding SubmitButtonText}"
+                            Command="{Binding SubmitCommand}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+                    <Button Text="Cancel"
+                            Command="{Binding CancelCommand}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+                </HorizontalStackLayout>
+
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

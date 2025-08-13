@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="DemoEventi.UI.Views.EventsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        
+        <!-- Header -->
+        <HorizontalStackLayout Grid.Row="0" Spacing="10" Padding="20,10">
+            <Button Text="Create Event" 
+                    Command="{Binding CreateEventCommand}"
+                    HorizontalOptions="Start" />
+            <Button Text="Refresh" 
+                    Command="{Binding RefreshCommand}"
+                    HorizontalOptions="End" />
+        </HorizontalStackLayout>
+
+        <!-- Error Message -->
+        <Frame Grid.Row="1" 
+               IsVisible="{Binding HasError}"
+               BackgroundColor="Red"
+               Padding="10"
+               Margin="20,0">
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="White"
+                   HorizontalOptions="Center" />
+        </Frame>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="1" 
+                          IsRunning="{Binding IsBusy}"
+                          IsVisible="{Binding IsBusy}"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center" />
+
+        <!-- Events List -->
+        <RefreshView Grid.Row="1" 
+                     Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding Events}"
+                           IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="10,5" Padding="15">
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="5">
+                                    <Label Text="{Binding Name}" 
+                                           FontSize="18" 
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding Location}" 
+                                           TextColor="Gray" 
+                                           FontSize="14" />
+                                    <Label Text="{Binding StartDate, StringFormat='{0:g}'}" 
+                                           TextColor="Gray" 
+                                           FontSize="14" />
+                                    <Label Text="{Binding ParticipantCount, StringFormat='{0} participants'}" 
+                                           TextColor="Blue" 
+                                           FontSize="12" />
+                                </VerticalStackLayout>
+                                
+                                <Button Grid.Column="1" 
+                                        Text="Edit" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditEventCommand}"
+                                        CommandParameter="{Binding}"
+                                        Margin="10,0,5,0" />
+                                
+                                <Button Grid.Column="2" 
+                                        Text="Delete" 
+                                        BackgroundColor="Red"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteEventCommand}"
+                                        CommandParameter="{Binding}"
+                                        Margin="5,0,0,0" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Empty State -->
+        <VerticalStackLayout Grid.Row="1" 
+                             IsVisible="{Binding Events.Count, Converter={StaticResource CountToVisibilityConverter}}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center">
+            <Label Text="No events found" 
+                   FontSize="18" 
+                   TextColor="Gray" />
+            <Button Text="Create First Event" 
+                    Command="{Binding CreateEventCommand}"
+                    Margin="0,10,0,0" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

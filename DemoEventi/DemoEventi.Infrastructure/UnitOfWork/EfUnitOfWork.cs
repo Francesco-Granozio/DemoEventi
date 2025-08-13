@@ -10,12 +10,14 @@ public class EfUnitOfWork : IUnitOfWork
 
     public IUserRepository Users { get; }
     public IEventRepository Events { get; }
+    public IInterestRepository Interests { get; }
 
     public EfUnitOfWork(AppDbContext context)
     {
         _context = context;
         Users = new UserRepository(context);
         Events = new EventRepository(context);
+        Interests = new InterestRepository(context);
     }
 
     public async Task<int> CommitAsync()
