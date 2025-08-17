@@ -9,6 +9,7 @@ public class ApiService : IApiService
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
+    private readonly string[] _fallbackUrls;
 
     public ApiService(HttpClient httpClient)
     {
@@ -16,6 +17,16 @@ public class ApiService : IApiService
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+        
+        // Fallback URLs to try if primary fails
+        _fallbackUrls = new[]
+        {
+            "http://10.0.2.2:5163/", // Android emulator host (primary fallback)
+            "http://192.168.1.4:5163/", // Current host IP
+            "https://192.168.1.4:7042/",
+            "http://localhost:5163/",
+            "https://localhost:7042/"
         };
     }
 
@@ -159,20 +170,89 @@ public class ApiService : IApiService
 
     public async Task<Result<IEnumerable<InterestDto>>> GetInterestsAsync()
     {
+        return await TryMultipleUrlsAsync<IEnumerable<InterestDto>>("api/interests", async (client, url) =>
+        {
+            var response = await client.GetAsync(url);
+            return await HandleResponseAsync<IEnumerable<InterestDto>>(response);
+        });
+    }
+
+    private async Task<Result<T>> TryMultipleUrlsAsync<T>(string endpoint, Func<HttpClient, string, Task<Result<T>>> operation)
+    {
+        var errors = new List<string>();
+        
+        // Try primary URL first
         try
         {
-            var response = await _httpClient.GetAsync("api/Interests");
-            return await HandleResponseAsync<IEnumerable<InterestDto>>(response);
+            var primaryUrl = $"{_httpClient.BaseAddress}{endpoint}";
+            System.Diagnostics.Debug.WriteLine($"[API] Trying primary URL: {primaryUrl}");
+            
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+            using var client = new HttpClient(new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            })
+            {
+                BaseAddress = _httpClient.BaseAddress,
+                Timeout = TimeSpan.FromSeconds(8)
+            };
+            
+            var result = await operation(client, endpoint);
+            if (result.IsSuccess)
+            {
+                System.Diagnostics.Debug.WriteLine($"[API] Primary URL succeeded");
+                return result;
+            }
+            errors.Add($"Primary URL failed: {result.Error}");
         }
         catch (Exception ex)
         {
-            return Result<IEnumerable<InterestDto>>.Failure($"Error retrieving interests: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[API] Primary URL exception: {ex.Message}");
+            errors.Add($"Primary URL exception: {ex.Message}");
         }
+
+        // Try fallback URLs
+        foreach (var fallbackUrl in _fallbackUrls)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"[API] Trying fallback URL: {fallbackUrl}{endpoint}");
+                
+                using var client = new HttpClient(new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                })
+                {
+                    BaseAddress = new Uri(fallbackUrl),
+                    Timeout = TimeSpan.FromSeconds(5)
+                };
+                
+                var result = await operation(client, endpoint);
+                if (result.IsSuccess)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[API] Fallback URL succeeded: {fallbackUrl}");
+                    // Update primary client for future requests
+                    _httpClient.BaseAddress = new Uri(fallbackUrl);
+                    return result;
+                }
+                errors.Add($"{fallbackUrl}: {result.Error}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[API] Fallback URL {fallbackUrl} exception: {ex.Message}");
+                errors.Add($"{fallbackUrl}: {ex.Message}");
+            }
+        }
+
+        var combinedError = string.Join("; ", errors);
+        System.Diagnostics.Debug.WriteLine($"[API] All URLs failed: {combinedError}");
+        return Result<T>.Failure($"Could not connect to server. Tried multiple URLs. Errors: {combinedError}");
     }
 
     private async Task<Result<T>> HandleResponseAsync<T>(HttpResponseMessage response)
     {
         var content = await response.Content.ReadAsStringAsync();
+        System.Diagnostics.Debug.WriteLine($"Response content: {content}");
         
         if (response.IsSuccessStatusCode)
         {
@@ -183,6 +263,7 @@ public class ApiService : IApiService
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Deserialization error: {ex}");
                 return Result<T>.Failure($"Error deserializing response: {ex.Message}");
             }
         }

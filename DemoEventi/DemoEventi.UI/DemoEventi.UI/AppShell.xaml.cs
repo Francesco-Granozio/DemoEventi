@@ -1,4 +1,5 @@
 ﻿using DemoEventi.UI.ViewModels;
+using DemoEventi.UI.Views;
 
 namespace DemoEventi.UI;
 
@@ -7,6 +8,17 @@ public partial class AppShell : Shell
     public AppShell()
     {
         InitializeComponent();
+        RegisterRoutes();
+    }
+
+    private void RegisterRoutes()
+    {
+        Routing.RegisterRoute(nameof(HomePage), typeof(HomePage));
+        Routing.RegisterRoute(nameof(UsersPage), typeof(UsersPage));
+        Routing.RegisterRoute(nameof(EventsPage), typeof(EventsPage));
+        Routing.RegisterRoute(nameof(InterestsPage), typeof(InterestsPage));
+        Routing.RegisterRoute(nameof(UserFormPage), typeof(UserFormPage));
+        Routing.RegisterRoute(nameof(EventFormPage), typeof(EventFormPage));
     }
 
     protected override async void OnNavigating(ShellNavigatingEventArgs args)

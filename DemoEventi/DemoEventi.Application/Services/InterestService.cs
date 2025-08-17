@@ -21,12 +21,16 @@ public class InterestService : IInterestService
     {
         try
         {
+            System.Diagnostics.Debug.WriteLine("InterestService.GetAllAsync: Starting...");
             var interests = await _unitOfWork.Interests.GetAllAsync();
+            System.Diagnostics.Debug.WriteLine($"InterestService.GetAllAsync: Retrieved {interests?.Count() ?? 0} interests");
             var interestDtos = _mapper.Map<IEnumerable<InterestDto>>(interests);
+            System.Diagnostics.Debug.WriteLine($"InterestService.GetAllAsync: Mapped to {interestDtos?.Count() ?? 0} DTOs");
             return Result<IEnumerable<InterestDto>>.Success(interestDtos);
         }
         catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"InterestService.GetAllAsync: Exception: {ex}");
             return Result<IEnumerable<InterestDto>>.Failure($"Error retrieving interests: {ex.Message}");
         }
     }

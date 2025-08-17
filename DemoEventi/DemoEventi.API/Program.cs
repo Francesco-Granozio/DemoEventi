@@ -66,7 +66,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Commented out for mobile development - causes timeout issues
+// app.UseHttpsRedirection();
 
 app.UseCors("AllowMauiBlazor");
 

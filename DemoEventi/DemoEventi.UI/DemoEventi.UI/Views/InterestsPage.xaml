@@ -1,56 +1,67 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="DemoEventi.UI.Views.InterestsPage"
-             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="{Binding Title}">
+<ContentPage
+    x:Class="DemoEventi.UI.Views.InterestsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="{Binding Title}">
 
     <Grid RowDefinitions="Auto,*,Auto">
-        
-        <!-- Header -->
-        <HorizontalStackLayout Grid.Row="0" Spacing="10" Padding="20,10">
-            <Label Text="Available Interests" 
-                   FontSize="18" 
-                   FontAttributes="Bold"
-                   VerticalOptions="Center" />
-            <Button Text="Refresh" 
-                    Command="{Binding RefreshCommand}"
-                    HorizontalOptions="End" />
+
+        <!--  Header  -->
+        <HorizontalStackLayout
+            Grid.Row="0"
+            Padding="20,10"
+            Spacing="10">
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                Text="Available Interests"
+                VerticalOptions="Center" />
+            <Button
+                Command="{Binding RefreshCommand}"
+                HorizontalOptions="End"
+                Text="Refresh" />
         </HorizontalStackLayout>
 
-        <!-- Error Message -->
-        <Frame Grid.Row="1" 
-               IsVisible="{Binding HasError}"
-               BackgroundColor="Red"
-               Padding="10"
-               Margin="20,0">
-            <Label Text="{Binding ErrorMessage}" 
-                   TextColor="White"
-                   HorizontalOptions="Center" />
+        <!--  Error Message  -->
+        <Frame
+            Grid.Row="1"
+            Margin="20,0"
+            Padding="10"
+            BackgroundColor="Red"
+            IsVisible="{Binding HasError}">
+            <Label
+                HorizontalOptions="Center"
+                Text="{Binding ErrorMessage}"
+                TextColor="White" />
         </Frame>
 
-        <!-- Loading Indicator -->
-        <ActivityIndicator Grid.Row="1" 
-                          IsRunning="{Binding IsBusy}"
-                          IsVisible="{Binding IsBusy}"
-                          HorizontalOptions="Center"
-                          VerticalOptions="Center" />
+        <!--  Loading Indicator  -->
+        <ActivityIndicator
+            Grid.Row="1"
+            HorizontalOptions="Center"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}"
+            VerticalOptions="Center" />
 
-        <!-- Interests List -->
-        <RefreshView Grid.Row="1" 
-                     Command="{Binding RefreshCommand}"
-                     IsRefreshing="{Binding IsBusy}">
-            <CollectionView ItemsSource="{Binding Interests}"
-                           IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+        <!--  Interests List  -->
+        <RefreshView
+            Grid.Row="1"
+            Command="{Binding RefreshCommand}"
+            IsRefreshing="{Binding IsBusy}">
+            <CollectionView IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" ItemsSource="{Binding Interests}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Margin="10,5" Padding="15">
                             <VerticalStackLayout Spacing="5">
-                                <Label Text="{Binding Name}" 
-                                       FontSize="18" 
-                                       FontAttributes="Bold" />
-                                <Label Text="{Binding Description}" 
-                                       TextColor="Gray" 
-                                       FontSize="14" />
+                                <Label
+                                    FontAttributes="Bold"
+                                    FontSize="18"
+                                    Text="{Binding Name}" />
+                                <Label
+                                    FontSize="14"
+                                    Text="{Binding Description}"
+                                    TextColor="Gray" />
                             </VerticalStackLayout>
                         </Frame>
                     </DataTemplate>
@@ -58,14 +69,16 @@
             </CollectionView>
         </RefreshView>
 
-        <!-- Empty State -->
-        <VerticalStackLayout Grid.Row="1" 
-                             IsVisible="{Binding Interests.Count, Converter={StaticResource CountToVisibilityConverter}}"
-                             VerticalOptions="Center"
-                             HorizontalOptions="Center">
-            <Label Text="No interests found" 
-                   FontSize="18" 
-                   TextColor="Gray" />
+        <!--  Empty State  -->
+        <VerticalStackLayout
+            Grid.Row="1"
+            HorizontalOptions="Center"
+            IsVisible="{Binding Interests.Count, Converter={StaticResource CountToVisibilityConverter}}"
+            VerticalOptions="Center">
+            <Label
+                FontSize="18"
+                Text="No interests found"
+                TextColor="Gray" />
         </VerticalStackLayout>
 
     </Grid>

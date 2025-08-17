@@ -1,72 +1,74 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="DemoEventi.UI.Views.EventFormPage"
-             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="{Binding PageTitle}">
+<ContentPage
+    x:Class="DemoEventi.UI.Views.EventFormPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="{Binding PageTitle}">
 
     <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20">
+        <VerticalStackLayout Padding="20" Spacing="20">
 
-            <!-- Error Message -->
-            <Frame IsVisible="{Binding HasError}"
-                   BackgroundColor="Red"
-                   Padding="10">
-                <Label Text="{Binding ErrorMessage}" 
-                       TextColor="White"
-                       HorizontalOptions="Center" />
+            <!--  Error Message  -->
+            <Frame
+                Padding="10"
+                BackgroundColor="Red"
+                IsVisible="{Binding HasError}">
+                <Label
+                    HorizontalOptions="Center"
+                    Text="{Binding ErrorMessage}"
+                    TextColor="White" />
             </Frame>
 
-            <!-- Loading Indicator -->
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                              IsVisible="{Binding IsBusy}"
-                              HorizontalOptions="Center" />
+            <!--  Loading Indicator  -->
+            <ActivityIndicator
+                HorizontalOptions="Center"
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}" />
 
-            <!-- Form Content -->
-            <VerticalStackLayout IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
-                                 Spacing="15">
+            <!--  Form Content  -->
+            <VerticalStackLayout IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" Spacing="15">
 
-                <!-- Event Name -->
+                <!--  Event Name  -->
                 <VerticalStackLayout Spacing="5">
-                    <Label Text="Event Name" FontAttributes="Bold" />
-                    <Entry Text="{Binding Name}" 
-                           Placeholder="Enter event name" />
+                    <Label FontAttributes="Bold" Text="Event Name" />
+                    <Entry Placeholder="Enter event name" Text="{Binding Name}" />
                 </VerticalStackLayout>
 
-                <!-- Location -->
+                <!--  Location  -->
                 <VerticalStackLayout Spacing="5">
-                    <Label Text="Location" FontAttributes="Bold" />
-                    <Entry Text="{Binding Location}" 
-                           Placeholder="Enter location" />
+                    <Label FontAttributes="Bold" Text="Location" />
+                    <Entry Placeholder="Enter location" Text="{Binding Location}" />
                 </VerticalStackLayout>
 
-                <!-- Start Date -->
+                <!--  Start Date  -->
                 <VerticalStackLayout Spacing="5">
-                    <Label Text="Start Date" FontAttributes="Bold" />
+                    <Label FontAttributes="Bold" Text="Start Date" />
                     <DatePicker Date="{Binding StartDate}" />
                 </VerticalStackLayout>
 
-                <!-- Start Time -->
+                <!--  Start Time  -->
                 <VerticalStackLayout Spacing="5">
-                    <Label Text="Start Time" FontAttributes="Bold" />
+                    <Label FontAttributes="Bold" Text="Start Time" />
                     <TimePicker Time="{Binding StartTime}" />
                 </VerticalStackLayout>
 
-                <!-- Participants -->
+                <!--  Participants  -->
                 <VerticalStackLayout Spacing="5">
-                    <Label Text="Participants" FontAttributes="Bold" />
+                    <Label FontAttributes="Bold" Text="Participants" />
                     <Frame Padding="10" BackgroundColor="LightGray">
-                        <CollectionView ItemsSource="{Binding AvailableUsers}"
-                                       HeightRequest="200">
+                        <CollectionView HeightRequest="200" ItemsSource="{Binding AvailableUsers}">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid ColumnDefinitions="Auto,*" Padding="5">
-                                        <CheckBox Grid.Column="0" 
-                                                  IsChecked="{Binding IsSelected}"
-                                                  VerticalOptions="Center" />
-                                        <Label Grid.Column="1" 
-                                               Text="{Binding Name}"
-                                               VerticalOptions="Center"
-                                               Margin="10,0,0,0" />
+                                    <Grid Padding="5" ColumnDefinitions="Auto,*">
+                                        <CheckBox
+                                            Grid.Column="0"
+                                            IsChecked="{Binding IsSelected}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            Grid.Column="1"
+                                            Margin="10,0,0,0"
+                                            Text="{Binding Name}"
+                                            VerticalOptions="Center" />
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
@@ -74,14 +76,16 @@
                     </Frame>
                 </VerticalStackLayout>
 
-                <!-- Buttons -->
-                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
-                    <Button Text="{Binding SubmitButtonText}"
-                            Command="{Binding SubmitCommand}"
-                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
-                    <Button Text="Cancel"
-                            Command="{Binding CancelCommand}"
-                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+                <!--  Buttons  -->
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                    <Button
+                        Command="{Binding SubmitCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                        Text="{Binding SubmitButtonText}" />
+                    <Button
+                        Command="{Binding CancelCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                        Text="Cancel" />
                 </HorizontalStackLayout>
 
             </VerticalStackLayout>

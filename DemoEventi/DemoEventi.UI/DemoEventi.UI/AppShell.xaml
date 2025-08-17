@@ -3,10 +3,9 @@
     x:Class="DemoEventi.UI.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:DemoEventi.UI.Converters"
     xmlns:local="clr-namespace:DemoEventi.UI"
     xmlns:views="clr-namespace:DemoEventi.UI.Views"
-    xmlns:converters="clr-namespace:DemoEventi.UI.Converters"
-    Shell.FlyoutBehavior="Disabled"
     Title="DemoEventi">
 
     <Shell.Resources>
@@ -14,34 +13,34 @@
         <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
     </Shell.Resources>
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate views:HomePage}"
-        Route="HomePage" />
-
-    <ShellContent
-        Title="Users"
-        ContentTemplate="{DataTemplate views:UsersPage}"
-        Route="UsersPage" />
-
-    <ShellContent
-        Title="Events"
-        ContentTemplate="{DataTemplate views:EventsPage}"
-        Route="EventsPage" />
-
-    <ShellContent
-        Title="Interests"
-        ContentTemplate="{DataTemplate views:InterestsPage}"
-        Route="InterestsPage" />
-
-    <ShellContent
-        Title="User Form"
-        ContentTemplate="{DataTemplate views:UserFormPage}"
-        Route="UserFormPage" />
-
-    <ShellContent
-        Title="Event Form"
-        ContentTemplate="{DataTemplate views:EventFormPage}"
-        Route="EventFormPage" />
+    <TabBar>
+        <Tab Title="Home" Icon="home.png">
+            <ShellContent
+                Title="Home"
+                ContentTemplate="{DataTemplate views:HomePage}"
+                Route="HomePage" />
+        </Tab>
+        
+        <Tab Title="Users" Icon="user.png">
+            <ShellContent
+                Title="Users"
+                ContentTemplate="{DataTemplate views:UsersPage}"
+                Route="UsersPage" />
+        </Tab>
+        
+        <Tab Title="Events" Icon="event.png">
+            <ShellContent
+                Title="Events"
+                ContentTemplate="{DataTemplate views:EventsPage}"
+                Route="EventsPage" />
+        </Tab>
+        
+        <Tab Title="Interests" Icon="interest.png">
+            <ShellContent
+                Title="Interests"
+                ContentTemplate="{DataTemplate views:InterestsPage}"
+                Route="InterestsPage" />
+        </Tab>
+    </TabBar>
 
 </Shell>

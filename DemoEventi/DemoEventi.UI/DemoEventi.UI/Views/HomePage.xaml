@@ -1,44 +1,48 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="DemoEventi.UI.Views.HomePage"
-             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="{Binding Title}">
+<ContentPage
+    x:Class="DemoEventi.UI.Views.HomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="{Binding Title}">
 
     <ScrollView>
-        <VerticalStackLayout Spacing="25" Padding="30,0" VerticalOptions="Center">
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25"
+            VerticalOptions="Center">
 
-            <Label 
-                Text="Welcome to DemoEventi"
-                SemanticProperties.HeadingLevel="Level1"
+            <Label
                 FontSize="32"
-                HorizontalOptions="Center" />
+                HorizontalOptions="Center"
+                SemanticProperties.HeadingLevel="Level1"
+                Text="Welcome to DemoEventi" />
 
-            <Label 
-                Text="Manage your events, users, and interests"
-                SemanticProperties.Description="Welcome to DemoEventi application"
+            <Label
                 FontSize="18"
                 HorizontalOptions="Center"
+                SemanticProperties.Description="Welcome to DemoEventi application"
+                Text="Manage your events, users, and interests"
                 TextColor="Gray" />
 
-            <Frame Padding="20" Margin="0,20,0,0">
+            <Frame Margin="0,20,0,0" Padding="20">
                 <VerticalStackLayout Spacing="15">
-                    <Button 
-                        Text="Users"
-                        SemanticProperties.Hint="Navigate to users page"
+                    <Button
                         Command="{Binding NavigateToUsersCommand}"
-                        HorizontalOptions="Center" />
+                        HorizontalOptions="Center"
+                        SemanticProperties.Hint="Navigate to users page"
+                        Text="Users" />
 
-                    <Button 
-                        Text="Events"
-                        SemanticProperties.Hint="Navigate to events page"
+                    <Button
                         Command="{Binding NavigateToEventsCommand}"
-                        HorizontalOptions="Center" />
+                        HorizontalOptions="Center"
+                        SemanticProperties.Hint="Navigate to events page"
+                        Text="Events" />
 
-                    <Button 
-                        Text="Interests"
-                        SemanticProperties.Hint="Navigate to interests page"
+                    <Button
                         Command="{Binding NavigateToInterestsCommand}"
-                        HorizontalOptions="Center" />
+                        HorizontalOptions="Center"
+                        SemanticProperties.Hint="Navigate to interests page"
+                        Text="Interests" />
                 </VerticalStackLayout>
             </Frame>
 

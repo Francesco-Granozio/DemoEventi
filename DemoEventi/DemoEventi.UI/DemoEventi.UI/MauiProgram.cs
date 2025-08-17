@@ -19,12 +19,26 @@ public static class MauiProgram
         builder.Services.AddHttpClient<Services.IApiService, Services.ApiService>(client =>
         {
 #if DEBUG
-            // For Android emulator, use 10.0.2.2 to access host machine
-            // For physical devices, use your machine's actual IP address
-            client.BaseAddress = new Uri("https://10.0.2.2:7042/");
+            // For Android emulator, use 10.0.2.2 which maps to host's localhost
+            // This is the standard way for Android emulator to access host machine
+            client.BaseAddress = new Uri("http://10.0.2.2:5163/");
+            client.Timeout = TimeSpan.FromSeconds(15); // Reduced timeout for faster failure detection
 #else
             client.BaseAddress = new Uri("https://localhost:7042/");
+            client.Timeout = TimeSpan.FromSeconds(30);
 #endif
+        })
+        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+            {
+#if DEBUG
+                // Allow all certificates in debug mode
+                return true;
+#else
+                return errors == System.Net.Security.SslPolicyErrors.None;
+#endif
+            }
         });
 
         // Register ViewModels
