@@ -3,83 +3,110 @@
     x:Class="DemoEventi.UI.Views.InterestsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="{Binding Title}">
+    Title="{Binding Title}"
+    BackgroundColor="{StaticResource BackgroundSecondary}">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,*">
 
         <!--  Header  -->
-        <HorizontalStackLayout
+        <StackLayout
             Grid.Row="0"
-            Padding="20,10"
-            Spacing="10">
+            Padding="20,16,20,8">
             <Label
-                FontAttributes="Bold"
-                FontSize="18"
-                Text="Available Interests"
-                VerticalOptions="Center" />
+                Style="{StaticResource LargeTitleStyle}"
+                Text="Interests"
+                Margin="0,0,0,8" />
             <Button
+                Style="{StaticResource SecondaryButtonStyle}"
                 Command="{Binding RefreshCommand}"
-                HorizontalOptions="End"
-                Text="Refresh" />
-        </HorizontalStackLayout>
+                Text="↻ Refresh"
+                HorizontalOptions="Start"
+                WidthRequest="120" />
+        </StackLayout>
 
         <!--  Error Message  -->
         <Frame
             Grid.Row="1"
-            Margin="20,0"
-            Padding="10"
-            BackgroundColor="Red"
-            IsVisible="{Binding HasError}">
+            Style="{StaticResource CardStyle}"
+            BackgroundColor="{StaticResource Danger}"
+            IsVisible="{Binding HasError}"
+            Margin="20,8">
             <Label
+                Style="{StaticResource BodyStyle}"
                 HorizontalOptions="Center"
                 Text="{Binding ErrorMessage}"
-                TextColor="White" />
+                TextColor="{StaticResource White}" />
         </Frame>
 
         <!--  Loading Indicator  -->
-        <ActivityIndicator
+        <StackLayout
             Grid.Row="1"
-            HorizontalOptions="Center"
-            IsRunning="{Binding IsBusy}"
             IsVisible="{Binding IsBusy}"
-            VerticalOptions="Center" />
+            VerticalOptions="Center"
+            HorizontalOptions="Center">
+            <ActivityIndicator
+                IsRunning="{Binding IsBusy}"
+                Color="{StaticResource Primary}"
+                WidthRequest="40"
+                HeightRequest="40" />
+            <Label
+                Style="{StaticResource FootnoteStyle}"
+                Text="Loading interests..."
+                HorizontalOptions="Center"
+                Margin="0,12,0,0" />
+        </StackLayout>
 
         <!--  Interests List  -->
         <RefreshView
             Grid.Row="1"
             Command="{Binding RefreshCommand}"
-            IsRefreshing="{Binding IsBusy}">
-            <CollectionView IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" ItemsSource="{Binding Interests}">
+            RefreshColor="{StaticResource Primary}"
+            IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+            <CollectionView 
+                ItemsSource="{Binding Interests}"
+                ItemSizingStrategy="MeasureAllItems"
+                VerticalScrollBarVisibility="Never">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Margin="10,5" Padding="15">
-                            <VerticalStackLayout Spacing="5">
+                        <Frame Style="{StaticResource CompactCardStyle}">
+                            <VerticalStackLayout Spacing="8">
                                 <Label
-                                    FontAttributes="Bold"
-                                    FontSize="18"
+                                    Style="{StaticResource HeadlineStyle}"
                                     Text="{Binding Name}" />
                                 <Label
-                                    FontSize="14"
+                                    Style="{StaticResource CalloutStyle}"
                                     Text="{Binding Description}"
-                                    TextColor="Gray" />
+                                    TextColor="{StaticResource TextSecondary}"
+                                    LineBreakMode="WordWrap" />
                             </VerticalStackLayout>
                         </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout 
+                        HorizontalOptions="Center" 
+                        VerticalOptions="Center"
+                        Spacing="16"
+                        Padding="40">
+                        <Label
+                            Style="{StaticResource Title2Style}"
+                            Text="🌟"
+                            HorizontalOptions="Center"
+                            FontSize="48" />
+                        <Label
+                            Style="{StaticResource Title3Style}"
+                            Text="No Interests Found"
+                            HorizontalOptions="Center" />
+                        <Label
+                            Style="{StaticResource BodyStyle}"
+                            Text="Pull down to refresh and discover new interests!"
+                            TextColor="{StaticResource TextSecondary}"
+                            HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
             </CollectionView>
         </RefreshView>
-
-        <!--  Empty State  -->
-        <VerticalStackLayout
-            Grid.Row="1"
-            HorizontalOptions="Center"
-            IsVisible="{Binding Interests.Count, Converter={StaticResource CountToVisibilityConverter}}"
-            VerticalOptions="Center">
-            <Label
-                FontSize="18"
-                Text="No interests found"
-                TextColor="Gray" />
-        </VerticalStackLayout>
 
     </Grid>
 

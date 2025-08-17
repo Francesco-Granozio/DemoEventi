@@ -2,7 +2,6 @@
 using DemoEventi.Application.Common;
 using DemoEventi.Application.DTOs;
 using DemoEventi.Application.Interfaces;
-using DemoEventi.Application.Validators;
 using DemoEventi.Domain.Entities;
 using DemoEventi.Domain.Interfaces;
 using FluentValidation;
@@ -47,7 +46,7 @@ public class UserService : IUserService
             }
 
             await _unitOfWork.Users.AddAsync(user);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var userDto = _mapper.Map<UserDto>(user);
             return Result<UserDto>.Success(userDto);
@@ -128,7 +127,7 @@ public class UserService : IUserService
             }
 
             _unitOfWork.Users.Update(existingUser);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var userDto = _mapper.Map<UserDto>(existingUser);
             return Result<UserDto>.Success(userDto);
@@ -150,7 +149,7 @@ public class UserService : IUserService
             }
 
             _unitOfWork.Users.Delete(user);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return Result.Success();
         }

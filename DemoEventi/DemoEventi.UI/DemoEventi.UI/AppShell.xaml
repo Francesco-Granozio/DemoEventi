@@ -11,35 +11,46 @@
     <Shell.Resources>
         <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        
+        <!-- Instagram-style Tab Bar Styling -->
+        
+        <!-- Tab styling removed due to property limitations -->
     </Shell.Resources>
 
     <TabBar>
-        <Tab Title="Home" Icon="home.png">
+        <Tab Title="Home" Icon="home_icon">
             <ShellContent
                 Title="Home"
                 ContentTemplate="{DataTemplate views:HomePage}"
                 Route="HomePage" />
         </Tab>
         
-        <Tab Title="Users" Icon="user.png">
+        <Tab Title="Search" Icon="search_icon">
             <ShellContent
-                Title="Users"
+                Title="Search"
                 ContentTemplate="{DataTemplate views:UsersPage}"
-                Route="UsersPage" />
+                Route="SearchPage" />
         </Tab>
         
-        <Tab Title="Events" Icon="event.png">
+        <Tab Title="Events" Icon="events_icon">
             <ShellContent
                 Title="Events"
                 ContentTemplate="{DataTemplate views:EventsPage}"
                 Route="EventsPage" />
         </Tab>
         
-        <Tab Title="Interests" Icon="interest.png">
+        <Tab Title="Interests" Icon="interests_icon">
             <ShellContent
                 Title="Interests"
                 ContentTemplate="{DataTemplate views:InterestsPage}"
                 Route="InterestsPage" />
+        </Tab>
+        
+        <Tab Title="Profile" Icon="users_icon">
+            <ShellContent
+                Title="Profile"
+                ContentTemplate="{DataTemplate views:UsersPage}"
+                Route="ProfilePage" />
         </Tab>
     </TabBar>
 

@@ -1,8 +1,8 @@
 using AutoMapper;
-using MediatR;
 using DemoEventi.Application.Common;
 using DemoEventi.Application.DTOs;
 using DemoEventi.Domain.Interfaces;
+using MediatR;
 
 namespace DemoEventi.Application.Users.Commands.UpdateUser;
 
@@ -28,15 +28,15 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
             }
 
             // Update properties
-            existingUser.FirstName = request.FirstName;
-            existingUser.LastName = request.LastName;
+            existingUser.FirstName = request.UpdateUserDto.FirstName;
+            existingUser.LastName = request.UpdateUserDto.LastName;
             existingUser.DataOraModifica = DateTime.UtcNow;
 
             // TODO: Handle interests update
             // existingUser.Interests = await _unitOfWork.Interests.GetByIdsAsync(request.InterestIds);
 
             _unitOfWork.Users.Update(existingUser);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var userDto = _mapper.Map<UserDto>(existingUser);
             return Result<UserDto>.Success(userDto);

@@ -1,9 +1,9 @@
 using AutoMapper;
-using MediatR;
 using DemoEventi.Application.Common;
 using DemoEventi.Application.DTOs;
 using DemoEventi.Domain.Entities;
 using DemoEventi.Domain.Interfaces;
+using MediatR;
 
 namespace DemoEventi.Application.Events.Commands.CreateEvent;
 
@@ -25,14 +25,14 @@ public class CreateEventCommandHandler : IRequestHandler<CreateEventCommand, Res
             var ev = new Event
             {
                 Id = Guid.NewGuid(),
-                Name = request.Name,
-                Location = request.Location,
-                StartDate = request.StartDate,
+                Name = request.CreateEventDto.Name,
+                Location = request.CreateEventDto.Location,
+                StartDate = request.CreateEventDto.StartDate,
                 DataOraCreazione = DateTime.UtcNow
             };
 
             await _unitOfWork.Events.AddAsync(ev);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var eventDto = _mapper.Map<EventDto>(ev);
             return Result<EventDto>.Success(eventDto);

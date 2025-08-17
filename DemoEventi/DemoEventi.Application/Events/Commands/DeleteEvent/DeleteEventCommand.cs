@@ -1,5 +1,5 @@
-using MediatR;
 using DemoEventi.Application.Common;
+using MediatR;
 
 namespace DemoEventi.Application.Events.Commands.DeleteEvent;
 

@@ -1,8 +1,8 @@
 using AutoMapper;
-using MediatR;
 using DemoEventi.Application.Common;
 using DemoEventi.Application.DTOs;
 using DemoEventi.Domain.Interfaces;
+using MediatR;
 
 namespace DemoEventi.Application.Events.Commands.UpdateEvent;
 
@@ -37,7 +37,7 @@ public class UpdateEventCommandHandler : IRequestHandler<UpdateEventCommand, Res
             // existingEvent.Participants = await _unitOfWork.Users.GetByIdsAsync(request.ParticipantIds);
 
             _unitOfWork.Events.Update(existingEvent);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var eventDto = _mapper.Map<EventDto>(existingEvent);
             return Result<EventDto>.Success(eventDto);

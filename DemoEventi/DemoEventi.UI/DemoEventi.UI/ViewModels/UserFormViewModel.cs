@@ -1,8 +1,8 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DemoEventi.Application.DTOs;
 using DemoEventi.UI.Services;
+using System.Collections.ObjectModel;
 
 namespace DemoEventi.UI.ViewModels;
 
@@ -137,7 +137,7 @@ public partial class UserFormViewModel : BaseViewModel
                 InterestIds = selectedInterestIds
             };
 
-            var result = IsEdit 
+            var result = IsEdit
                 ? await _apiService.UpdateUserAsync(UserId, userDto)
                 : await _apiService.CreateUserAsync(userDto);
 

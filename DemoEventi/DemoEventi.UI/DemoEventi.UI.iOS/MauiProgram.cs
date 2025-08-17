@@ -1,6 +1,4 @@
-﻿using DemoEventi.UI;
-
-namespace DemoEventi.UI.iOS
+﻿namespace DemoEventi.UI.iOS
 {
     public static class MauiProgram
     {

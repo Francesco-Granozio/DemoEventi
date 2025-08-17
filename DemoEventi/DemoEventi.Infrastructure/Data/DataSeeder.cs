@@ -39,38 +39,38 @@ public static class DataSeeder
 
             var users = new List<User>
             {
-                new() 
-                { 
-                    Id = Guid.NewGuid(), 
-                    FirstName = "John", 
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = "John",
                     LastName = "Doe",
                     Interests = interests.Take(3).ToList()
                 },
-                new() 
-                { 
-                    Id = Guid.NewGuid(), 
-                    FirstName = "Jane", 
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = "Jane",
                     LastName = "Smith",
                     Interests = interests.Skip(2).Take(2).ToList()
                 },
-                new() 
-                { 
-                    Id = Guid.NewGuid(), 
-                    FirstName = "Bob", 
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = "Bob",
                     LastName = "Johnson",
                     Interests = interests.Take(1).ToList()
                 },
-                new() 
-                { 
-                    Id = Guid.NewGuid(), 
-                    FirstName = "Alice", 
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = "Alice",
                     LastName = "Brown",
                     Interests = interests.Skip(4).Take(2).ToList()
                 },
-                new() 
-                { 
-                    Id = Guid.NewGuid(), 
-                    FirstName = "Charlie", 
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = "Charlie",
                     LastName = "Wilson",
                     Interests = interests.Skip(1).Take(3).ToList()
                 }
@@ -93,34 +93,34 @@ public static class DataSeeder
 
             var events = new List<Event>
             {
-                new() 
-                { 
-                    Id = Guid.NewGuid(), 
-                    Name = "Tech Conference 2024", 
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Tech Conference 2024",
                     Location = "San Francisco, CA",
                     StartDate = DateTime.Now.AddDays(30),
                     Participants = users.Take(3).ToList()
                 },
-                new() 
-                { 
-                    Id = Guid.NewGuid(), 
-                    Name = "Music Festival", 
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Music Festival",
                     Location = "Austin, TX",
                     StartDate = DateTime.Now.AddDays(45),
                     Participants = users.Skip(1).Take(2).ToList()
                 },
-                new() 
-                { 
-                    Id = Guid.NewGuid(), 
-                    Name = "Cooking Workshop", 
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Cooking Workshop",
                     Location = "New York, NY",
                     StartDate = DateTime.Now.AddDays(15),
                     Participants = users.Skip(2).Take(2).ToList()
                 },
-                new() 
-                { 
-                    Id = Guid.NewGuid(), 
-                    Name = "Sports Tournament", 
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Sports Tournament",
                     Location = "Los Angeles, CA",
                     StartDate = DateTime.Now.AddDays(60),
                     Participants = users.Take(2).ToList()

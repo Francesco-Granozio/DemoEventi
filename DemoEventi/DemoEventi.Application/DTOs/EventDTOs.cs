@@ -7,7 +7,7 @@ public class EventDto
     public string? Location { get; set; }
     public DateTime StartDate { get; set; }
     public IEnumerable<Guid>? ParticipantIds { get; set; }
-    
+
     // Computed properties for UI
     public int ParticipantCount => ParticipantIds?.Count() ?? 0;
 }

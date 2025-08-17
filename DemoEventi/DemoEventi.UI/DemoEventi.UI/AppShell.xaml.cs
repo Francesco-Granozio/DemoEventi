@@ -33,7 +33,7 @@ public partial class AppShell : Shell
                 var queryString = args.Target.Location.Query;
                 var userIdParam = queryString.Split('&')
                     .FirstOrDefault(p => p.StartsWith("UserId="));
-                
+
                 if (userIdParam != null && Guid.TryParse(userIdParam.Split('=')[1], out var userId))
                 {
                     // Set edit mode for UserFormViewModel
@@ -52,7 +52,7 @@ public partial class AppShell : Shell
                 var queryString = args.Target.Location.Query;
                 var eventIdParam = queryString.Split('&')
                     .FirstOrDefault(p => p.StartsWith("EventId="));
-                
+
                 if (eventIdParam != null && Guid.TryParse(eventIdParam.Split('=')[1], out var eventId))
                 {
                     // Set edit mode for EventFormViewModel

@@ -1,9 +1,9 @@
 using AutoMapper;
-using MediatR;
 using DemoEventi.Application.Common;
 using DemoEventi.Application.DTOs;
 using DemoEventi.Domain.Entities;
 using DemoEventi.Domain.Interfaces;
+using MediatR;
 
 namespace DemoEventi.Application.Users.Commands.CreateUser;
 
@@ -25,13 +25,13 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             var user = new User
             {
                 Id = Guid.NewGuid(),
-                FirstName = request.FirstName,
-                LastName = request.LastName,
+                FirstName = request.CreateUserDto.FirstName,
+                LastName = request.CreateUserDto.LastName,
                 DataOraCreazione = DateTime.UtcNow
             };
 
             await _unitOfWork.Users.AddAsync(user);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var userDto = _mapper.Map<UserDto>(user);
             return Result<UserDto>.Success(userDto);

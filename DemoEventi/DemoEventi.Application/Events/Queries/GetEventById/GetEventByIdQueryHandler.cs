@@ -1,8 +1,8 @@
 using AutoMapper;
-using MediatR;
 using DemoEventi.Application.Common;
 using DemoEventi.Application.DTOs;
 using DemoEventi.Domain.Interfaces;
+using MediatR;
 
 namespace DemoEventi.Application.Events.Queries.GetEventById;
 

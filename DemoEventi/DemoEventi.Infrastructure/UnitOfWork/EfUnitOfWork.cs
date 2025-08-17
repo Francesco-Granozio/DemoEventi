@@ -1,6 +1,7 @@
 ﻿using DemoEventi.Domain.Interfaces;
 using DemoEventi.Infrastructure.Data;
 using DemoEventi.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DemoEventi.Infrastructure.UnitOfWork;
 
@@ -20,8 +21,11 @@ public class EfUnitOfWork : IUnitOfWork
         Interests = new InterestRepository(context);
     }
 
-    public async Task<int> CommitAsync()
+    public async Task<int> SaveChangesAsync()
         => await _context.SaveChangesAsync();
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+        => await _context.Database.BeginTransactionAsync();
 
     public void Dispose()
         => _context.Dispose();

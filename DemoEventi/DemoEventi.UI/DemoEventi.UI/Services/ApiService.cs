@@ -1,7 +1,7 @@
-using System.Text;
-using System.Text.Json;
 using DemoEventi.Application.Common;
 using DemoEventi.Application.DTOs;
+using System.Text;
+using System.Text.Json;
 
 namespace DemoEventi.UI.Services;
 
@@ -18,7 +18,7 @@ public class ApiService : IApiService
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
-        
+
         // Fallback URLs to try if primary fails
         _fallbackUrls = new[]
         {
@@ -180,13 +180,10 @@ public class ApiService : IApiService
     private async Task<Result<T>> TryMultipleUrlsAsync<T>(string endpoint, Func<HttpClient, string, Task<Result<T>>> operation)
     {
         var errors = new List<string>();
-        
+
         // Try primary URL first
         try
         {
-            var primaryUrl = $"{_httpClient.BaseAddress}{endpoint}";
-            System.Diagnostics.Debug.WriteLine($"[API] Trying primary URL: {primaryUrl}");
-            
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
             using var client = new HttpClient(new HttpClientHandler
             {
@@ -196,18 +193,16 @@ public class ApiService : IApiService
                 BaseAddress = _httpClient.BaseAddress,
                 Timeout = TimeSpan.FromSeconds(8)
             };
-            
+
             var result = await operation(client, endpoint);
             if (result.IsSuccess)
             {
-                System.Diagnostics.Debug.WriteLine($"[API] Primary URL succeeded");
                 return result;
             }
             errors.Add($"Primary URL failed: {result.Error}");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[API] Primary URL exception: {ex.Message}");
             errors.Add($"Primary URL exception: {ex.Message}");
         }
 
@@ -216,8 +211,6 @@ public class ApiService : IApiService
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine($"[API] Trying fallback URL: {fallbackUrl}{endpoint}");
-                
                 using var client = new HttpClient(new HttpClientHandler
                 {
                     ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
@@ -226,11 +219,10 @@ public class ApiService : IApiService
                     BaseAddress = new Uri(fallbackUrl),
                     Timeout = TimeSpan.FromSeconds(5)
                 };
-                
+
                 var result = await operation(client, endpoint);
                 if (result.IsSuccess)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[API] Fallback URL succeeded: {fallbackUrl}");
                     // Update primary client for future requests
                     _httpClient.BaseAddress = new Uri(fallbackUrl);
                     return result;
@@ -239,21 +231,18 @@ public class ApiService : IApiService
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[API] Fallback URL {fallbackUrl} exception: {ex.Message}");
                 errors.Add($"{fallbackUrl}: {ex.Message}");
             }
         }
 
         var combinedError = string.Join("; ", errors);
-        System.Diagnostics.Debug.WriteLine($"[API] All URLs failed: {combinedError}");
         return Result<T>.Failure($"Could not connect to server. Tried multiple URLs. Errors: {combinedError}");
     }
 
     private async Task<Result<T>> HandleResponseAsync<T>(HttpResponseMessage response)
     {
         var content = await response.Content.ReadAsStringAsync();
-        System.Diagnostics.Debug.WriteLine($"Response content: {content}");
-        
+
         if (response.IsSuccessStatusCode)
         {
             try
@@ -263,7 +252,6 @@ public class ApiService : IApiService
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Deserialization error: {ex}");
                 return Result<T>.Failure($"Error deserializing response: {ex.Message}");
             }
         }

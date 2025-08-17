@@ -15,6 +15,8 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+
+
         // Register HTTP Client
         builder.Services.AddHttpClient<Services.IApiService, Services.ApiService>(client =>
         {

@@ -1,6 +1,4 @@
-﻿using DemoEventi.UI;
-
-namespace DemoEventi.UI.Droid
+﻿namespace DemoEventi.UI.Droid
 {
     public static class MauiProgram
     {

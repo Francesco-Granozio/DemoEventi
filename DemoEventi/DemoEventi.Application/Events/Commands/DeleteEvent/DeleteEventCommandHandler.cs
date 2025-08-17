@@ -1,6 +1,6 @@
-using MediatR;
 using DemoEventi.Application.Common;
 using DemoEventi.Domain.Interfaces;
+using MediatR;
 
 namespace DemoEventi.Application.Events.Commands.DeleteEvent;
 
@@ -24,7 +24,7 @@ public class DeleteEventCommandHandler : IRequestHandler<DeleteEventCommand, Res
             }
 
             _unitOfWork.Events.Delete(ev);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return Result.Success();
         }

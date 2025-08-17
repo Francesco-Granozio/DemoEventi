@@ -1,6 +1,6 @@
-using MediatR;
 using DemoEventi.Application.Common;
 using DemoEventi.Application.DTOs;
+using MediatR;
 
 namespace DemoEventi.Application.Users.Queries.GetAllUsers;
 

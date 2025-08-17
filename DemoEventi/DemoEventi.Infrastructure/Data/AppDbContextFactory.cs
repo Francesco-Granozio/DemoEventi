@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.EnvironmentVariables;
 
 namespace DemoEventi.Infrastructure.Data;
 
@@ -15,10 +14,10 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
         // Get the current directory (Infrastructure)
         var infrastructurePath = Directory.GetCurrentDirectory();
-        
+
         // Navigate to the API project directory
         var apiPath = Path.Combine(infrastructurePath, "..", "DemoEventi.API");
-        
+
         // If we're not in the expected structure, try to find the API project
         if (!Directory.Exists(apiPath))
         {
@@ -28,7 +27,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
             {
                 currentDir = Directory.GetParent(currentDir)?.FullName;
             }
-            
+
             if (currentDir != null)
             {
                 apiPath = Path.Combine(currentDir, "DemoEventi.API");
@@ -45,7 +44,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 
         // Get the connection string
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        
+
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             throw new InvalidOperationException(

@@ -2,7 +2,6 @@
 using DemoEventi.Application.Common;
 using DemoEventi.Application.DTOs;
 using DemoEventi.Application.Interfaces;
-using DemoEventi.Application.Validators;
 using DemoEventi.Domain.Entities;
 using DemoEventi.Domain.Interfaces;
 using FluentValidation;
@@ -47,7 +46,7 @@ public class EventService : IEventService
             }
 
             await _unitOfWork.Events.AddAsync(ev);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var eventDto = _mapper.Map<EventDto>(ev);
             return Result<EventDto>.Success(eventDto);
@@ -129,7 +128,7 @@ public class EventService : IEventService
             }
 
             _unitOfWork.Events.Update(existingEvent);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var eventDto = _mapper.Map<EventDto>(existingEvent);
             return Result<EventDto>.Success(eventDto);
@@ -151,7 +150,7 @@ public class EventService : IEventService
             }
 
             _unitOfWork.Events.Delete(ev);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return Result.Success();
         }
@@ -180,7 +179,7 @@ public class EventService : IEventService
                 }
             }
 
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
         catch (Exception ex)

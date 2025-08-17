@@ -1,10 +1,10 @@
+using DemoEventi.Application.Common.Behaviors;
 using DemoEventi.Application.Interfaces;
+using DemoEventi.Application.Mapping;
 using DemoEventi.Application.Services;
 using DemoEventi.Application.Validators;
-using DemoEventi.Application.Common.Behaviors;
-using DemoEventi.Application.Mapping;
-using DemoEventi.Infrastructure.Extensions;
 using DemoEventi.Infrastructure.Data;
+using DemoEventi.Infrastructure.Extensions;
 using FluentValidation;
 using MediatR;
 
@@ -37,13 +37,15 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 // Application layer
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(MappingProfile).Assembly));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(MappingProfile).Assembly));
 
 // FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
 
-// MediatR Pipeline Behaviors
+// MediatR Pipeline Behaviors (order matters!)
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 
 // Application services
 builder.Services.AddScoped<IUserService, UserService>();

@@ -1,5 +1,10 @@
 using DemoEventi.Application.DTOs;
-using DemoEventi.Application.Interfaces;
+using DemoEventi.Application.Users.Commands.CreateUser;
+using DemoEventi.Application.Users.Commands.DeleteUser;
+using DemoEventi.Application.Users.Commands.UpdateUser;
+using DemoEventi.Application.Users.Queries.GetAllUsers;
+using DemoEventi.Application.Users.Queries.GetUserById;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DemoEventi.API.Controllers;
@@ -8,11 +13,11 @@ namespace DemoEventi.API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IMediator _mediator;
 
-    public UsersController(IUserService userService)
+    public UsersController(IMediator mediator)
     {
-        _userService = userService;
+        _mediator = mediator;
     }
 
     /// <summary>
@@ -23,7 +28,8 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var result = await _userService.GetAllAsync();
+            var query = new GetAllUsersQuery();
+            var result = await _mediator.Send(query);
             if (result.IsSuccess)
             {
                 return Ok(result.Value);
@@ -44,7 +50,8 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var result = await _userService.GetByIdAsync(id);
+            var query = new GetUserByIdQuery { Id = id };
+            var result = await _mediator.Send(query);
             if (result.IsSuccess)
             {
                 return Ok(result.Value);
@@ -70,15 +77,11 @@ public class UsersController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var result = await _userService.CreateAsync(createUserDto);
+            var command = new CreateUserCommand { CreateUserDto = createUserDto };
+            var result = await _mediator.Send(command);
             if (result.IsSuccess)
             {
                 return CreatedAtAction(nameof(GetUser), new { id = result.Value.Id }, result.Value);
-            }
-
-            if (result.ValidationErrors.Any())
-            {
-                return BadRequest(new { message = "Validation failed", errors = result.ValidationErrors });
             }
 
             return BadRequest(new { message = result.Error });
@@ -93,7 +96,7 @@ public class UsersController : ControllerBase
     /// Update an existing user
     /// </summary>
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateUser(Guid id, [FromBody] CreateUserDto updateUserDto)
+    public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto updateUserDto)
     {
         try
         {
@@ -102,15 +105,11 @@ public class UsersController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var result = await _userService.UpdateAsync(id, updateUserDto);
+            var command = new UpdateUserCommand { Id = id, UpdateUserDto = updateUserDto };
+            var result = await _mediator.Send(command);
             if (result.IsSuccess)
             {
                 return NoContent();
-            }
-
-            if (result.ValidationErrors.Any())
-            {
-                return BadRequest(new { message = "Validation failed", errors = result.ValidationErrors });
             }
 
             return NotFound(new { message = result.Error });
@@ -129,7 +128,8 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var result = await _userService.DeleteAsync(id);
+            var command = new DeleteUserCommand { Id = id };
+            var result = await _mediator.Send(command);
             if (result.IsSuccess)
             {
                 return NoContent();

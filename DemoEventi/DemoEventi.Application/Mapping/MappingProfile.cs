@@ -11,7 +11,7 @@ public class MappingProfile : Profile
         // User mappings
         CreateMap<User, UserDto>()
             .ForMember(dest => dest.InterestIds, opt => opt.MapFrom(src => src.Interests.Select(i => i.Id)));
-        
+
         CreateMap<CreateUserDto, User>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.Interests, opt => opt.Ignore())
@@ -22,7 +22,7 @@ public class MappingProfile : Profile
         // Event mappings
         CreateMap<Event, EventDto>()
             .ForMember(dest => dest.ParticipantIds, opt => opt.MapFrom(src => src.Participants.Select(u => u.Id)));
-        
+
         CreateMap<CreateEventDto, Event>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.Participants, opt => opt.Ignore())

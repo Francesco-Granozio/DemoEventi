@@ -37,9 +37,8 @@
         <!-- Users List -->
         <RefreshView Grid.Row="1" 
                      Command="{Binding RefreshCommand}"
-                     IsRefreshing="{Binding IsBusy}">
-            <CollectionView ItemsSource="{Binding Users}"
-                           IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                     IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+            <CollectionView ItemsSource="{Binding Users}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Margin="10,5" Padding="15">
@@ -69,21 +68,18 @@
                         </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="No users found" 
+                               FontSize="18" 
+                               TextColor="Gray" />
+                        <Button Text="Create First User" 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CreateUserCommand}"
+                                Margin="0,10,0,0" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
             </CollectionView>
         </RefreshView>
-
-        <!-- Empty State -->
-        <VerticalStackLayout Grid.Row="1" 
-                             IsVisible="{Binding Users.Count, Converter={StaticResource CountToVisibilityConverter}}"
-                             VerticalOptions="Center"
-                             HorizontalOptions="Center">
-            <Label Text="No users found" 
-                   FontSize="18" 
-                   TextColor="Gray" />
-            <Button Text="Create First User" 
-                    Command="{Binding CreateUserCommand}"
-                    Margin="0,10,0,0" />
-        </VerticalStackLayout>
 
     </Grid>
 

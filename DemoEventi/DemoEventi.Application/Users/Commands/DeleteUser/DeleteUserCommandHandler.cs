@@ -1,6 +1,6 @@
-using MediatR;
 using DemoEventi.Application.Common;
 using DemoEventi.Domain.Interfaces;
+using MediatR;
 
 namespace DemoEventi.Application.Users.Commands.DeleteUser;
 
@@ -24,7 +24,7 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Resul
             }
 
             _unitOfWork.Users.Delete(user);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return Result.Success();
         }

@@ -15,22 +15,33 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        if (!_validators.Any()) return await next(cancellationToken);
-
-        var context = new ValidationContext<TRequest>(request);
-        var validationResults = await Task.WhenAll(
-            _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
-
-        var failures = validationResults
-            .SelectMany(r => r.Errors)
-            .Where(f => f != null)
-            .ToList();
-
-        if (failures.Count != 0)
+        if (_validators.Any())
         {
-            throw new ValidationException(failures);
+            var context = new ValidationContext<TRequest>(request);
+
+            var validationResults = await Task.WhenAll(
+                _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+
+            var failures = validationResults
+                .Where(r => !r.IsValid)
+                .SelectMany(r => r.Errors)
+                .Where(f => f != null)
+                .ToList();
+
+            if (failures.Any())
+            {
+                var errorMessage = string.Join("; ", failures.Select(f => f.ErrorMessage));
+
+                // Return failure result using the existing Result pattern
+                if (typeof(TResponse).IsGenericType && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
+                {
+                    var resultType = typeof(TResponse).GetGenericArguments()[0];
+                    var failureMethod = typeof(Result<>).MakeGenericType(resultType).GetMethod("Failure", new[] { typeof(string) });
+                    return (TResponse)failureMethod!.Invoke(null, new object[] { $"Validation failed: {errorMessage}" })!;
+                }
+            }
         }
 
-        return await next(cancellationToken);
+        return await next();
     }
 }
