@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DemoEventi.Application.DTOs;
 using DemoEventi.UI.Services;
+using DemoEventi.UI.Views;
 using System.Collections.ObjectModel;
 
 namespace DemoEventi.UI.ViewModels;
@@ -56,7 +57,7 @@ public partial class UsersViewModel : BaseViewModel
     [RelayCommand]
     private async Task CreateUserAsync()
     {
-        await Shell.Current.GoToAsync("//UserFormPage");
+        await Shell.Current.GoToAsync(nameof(UserFormPage));
     }
 
     [RelayCommand]
@@ -66,7 +67,7 @@ public partial class UsersViewModel : BaseViewModel
         {
             { "UserId", user.Id }
         };
-        await Shell.Current.GoToAsync("//UserFormPage", parameters);
+        await Shell.Current.GoToAsync(nameof(UserFormPage), parameters);
     }
 
     [RelayCommand]

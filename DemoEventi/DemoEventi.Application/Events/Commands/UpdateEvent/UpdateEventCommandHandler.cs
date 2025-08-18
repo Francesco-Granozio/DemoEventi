@@ -33,8 +33,22 @@ public class UpdateEventCommandHandler : IRequestHandler<UpdateEventCommand, Res
             existingEvent.StartDate = request.StartDate;
             existingEvent.DataOraModifica = DateTime.UtcNow;
 
-            // TODO: Handle participants update
-            // existingEvent.Participants = await _unitOfWork.Users.GetByIdsAsync(request.ParticipantIds);
+            // Handle participants update
+            if (request.ParticipantIds != null)
+            {
+                // Clear existing participants
+                existingEvent.Participants.Clear();
+                
+                // Add new participants
+                foreach (var participantId in request.ParticipantIds)
+                {
+                    var user = await _unitOfWork.Users.GetByIdAsync(participantId);
+                    if (user != null)
+                    {
+                        existingEvent.Participants.Add(user);
+                    }
+                }
+            }
 
             _unitOfWork.Events.Update(existingEvent);
             await _unitOfWork.SaveChangesAsync();

@@ -11,14 +11,31 @@ public partial class AppShell : Shell
         RegisterRoutes();
     }
 
+    public void ShowMainApp()
+    {
+        LoginShell.IsVisible = false;
+        MainTabBar.IsVisible = true;
+        CurrentItem = MainTabBar;
+    }
+
+    public void ShowLogin()
+    {
+        MainTabBar.IsVisible = false;
+        LoginShell.IsVisible = true;
+        CurrentItem = LoginShell;
+    }
+
     private void RegisterRoutes()
     {
         Routing.RegisterRoute(nameof(HomePage), typeof(HomePage));
         Routing.RegisterRoute(nameof(UsersPage), typeof(UsersPage));
         Routing.RegisterRoute(nameof(EventsPage), typeof(EventsPage));
         Routing.RegisterRoute(nameof(InterestsPage), typeof(InterestsPage));
+        Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
         Routing.RegisterRoute(nameof(UserFormPage), typeof(UserFormPage));
         Routing.RegisterRoute(nameof(EventFormPage), typeof(EventFormPage));
+        Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
+        Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
     }
 
     protected override async void OnNavigating(ShellNavigatingEventArgs args)

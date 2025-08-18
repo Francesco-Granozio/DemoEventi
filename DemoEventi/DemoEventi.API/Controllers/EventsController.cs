@@ -17,19 +17,54 @@ public class EventsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all events
+    /// Get all events with optional search and pagination
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<EventDto>>> GetEvents()
+    public async Task<ActionResult> GetEvents(
+        [FromQuery] string? search = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
         try
         {
             var result = await _eventService.GetAllAsync();
-            if (result.IsSuccess)
+            if (!result.IsSuccess)
             {
-                return Ok(result.Value);
+                return StatusCode(500, new { message = result.Error });
             }
-            return StatusCode(500, new { message = result.Error });
+
+            var events = result.Value!.AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                events = events.Where(e => 
+                    e.Name!.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    e.Location!.Contains(search, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Apply pagination
+            var totalCount = events.Count();
+            var pagedEvents = events
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var response = new
+            {
+                events = pagedEvents,
+                pagination = new
+                {
+                    currentPage = page,
+                    pageSize,
+                    totalCount,
+                    totalPages = (int)Math.Ceiling((double)totalCount / pageSize),
+                    hasNextPage = page < Math.Ceiling((double)totalCount / pageSize),
+                    hasPreviousPage = page > 1
+                }
+            };
+
+            return Ok(response);
         }
         catch (Exception ex)
         {

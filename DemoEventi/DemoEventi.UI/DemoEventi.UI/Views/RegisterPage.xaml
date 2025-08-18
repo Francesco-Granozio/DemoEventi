@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="DemoEventi.UI.Views.RegisterPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:DemoEventi.UI.ViewModels"
+             x:DataType="viewmodels:RegisterViewModel"
+             Title="Register"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+
+    <ScrollView>
+        <StackLayout Padding="40,60,40,40" Spacing="25">
+            
+            <!-- Header -->
+            <StackLayout HorizontalOptions="Center" Spacing="10">
+                <Image Source="dotnet_bot.png" 
+                       WidthRequest="60" 
+                       HeightRequest="60" />
+                <Label Text="Create Account" 
+                       FontSize="28" 
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       TextColor="{StaticResource Primary}" />
+                <Label Text="Join DemoEventi today!" 
+                       FontSize="16" 
+                       HorizontalOptions="Center"
+                       TextColor="{StaticResource TextSecondary}" />
+            </StackLayout>
+
+            <!-- Registration Form -->
+            <Frame Style="{StaticResource CardFrameStyle}" Padding="20">
+                <StackLayout Spacing="20">
+                    
+                    <!-- First Name -->
+                    <StackLayout>
+                        <Label Text="First Name" 
+                               Style="{StaticResource BodyLabelStyle}" />
+                        <Entry Text="{Binding FirstName}" 
+                               Placeholder="Enter your first name"
+                               Style="{StaticResource EntryStyle}" />
+                    </StackLayout>
+
+                    <!-- Last Name -->
+                    <StackLayout>
+                        <Label Text="Last Name" 
+                               Style="{StaticResource BodyLabelStyle}" />
+                        <Entry Text="{Binding LastName}" 
+                               Placeholder="Enter your last name"
+                               Style="{StaticResource EntryStyle}" />
+                    </StackLayout>
+
+                    <!-- Email -->
+                    <StackLayout>
+                        <Label Text="Email" 
+                               Style="{StaticResource BodyLabelStyle}" />
+                        <Entry Text="{Binding Email}" 
+                               Placeholder="Enter your email"
+                               Keyboard="Email"
+                               Style="{StaticResource EntryStyle}" />
+                    </StackLayout>
+
+                    <!-- Password -->
+                    <StackLayout>
+                        <Label Text="Password" 
+                               Style="{StaticResource BodyLabelStyle}" />
+                        <Entry Text="{Binding Password}" 
+                               Placeholder="Enter your password"
+                               IsPassword="True"
+                               Style="{StaticResource EntryStyle}" />
+                    </StackLayout>
+
+                    <!-- Confirm Password -->
+                    <StackLayout>
+                        <Label Text="Confirm Password" 
+                               Style="{StaticResource BodyLabelStyle}" />
+                        <Entry Text="{Binding ConfirmPassword}" 
+                               Placeholder="Confirm your password"
+                               IsPassword="True"
+                               Style="{StaticResource EntryStyle}" />
+                    </StackLayout>
+
+                    <!-- Register Button -->
+                    <Button Text="Create Account" 
+                            Command="{Binding RegisterCommand}"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+
+                    <!-- Login Link -->
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                        <Label Text="Already have an account?" 
+                               Style="{StaticResource BodyLabelStyle}" />
+                        <Label Text="Login here" 
+                               TextColor="{StaticResource Primary}"
+                               FontAttributes="Bold"
+                               Style="{StaticResource BodyLabelStyle}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding NavigateToLoginCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+
+                </StackLayout>
+            </Frame>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+                   Style="{StaticResource ErrorLabelStyle}"
+                   IsVisible="{Binding HasError}" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource Primary}" />
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>

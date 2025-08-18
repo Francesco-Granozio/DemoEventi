@@ -17,6 +17,9 @@ public static class MauiProgram
 
 
 
+        // Register Services
+        builder.Services.AddSingleton<Services.IAuthService, Services.AuthService>();
+
         // Register HTTP Client
         builder.Services.AddHttpClient<Services.IApiService, Services.ApiService>(client =>
         {
@@ -48,16 +51,22 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewModels.UsersViewModel>();
         builder.Services.AddTransient<ViewModels.EventsViewModel>();
         builder.Services.AddTransient<ViewModels.InterestsViewModel>();
+        builder.Services.AddTransient<ViewModels.ProfileViewModel>();
         builder.Services.AddTransient<ViewModels.UserFormViewModel>();
         builder.Services.AddTransient<ViewModels.EventFormViewModel>();
+        builder.Services.AddTransient<ViewModels.LoginViewModel>();
+        builder.Services.AddTransient<ViewModels.RegisterViewModel>();
 
         // Register Views
         builder.Services.AddTransient<Views.HomePage>();
         builder.Services.AddTransient<Views.UsersPage>();
         builder.Services.AddTransient<Views.EventsPage>();
         builder.Services.AddTransient<Views.InterestsPage>();
+        builder.Services.AddTransient<Views.ProfilePage>();
         builder.Services.AddTransient<Views.UserFormPage>();
         builder.Services.AddTransient<Views.EventFormPage>();
+        builder.Services.AddTransient<Views.LoginPage>();
+        builder.Services.AddTransient<Views.RegisterPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

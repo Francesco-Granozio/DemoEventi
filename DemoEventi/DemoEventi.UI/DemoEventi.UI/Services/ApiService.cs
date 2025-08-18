@@ -71,7 +71,7 @@ public class ApiService : IApiService
         }
     }
 
-    public async Task<Result<UserDto>> UpdateUserAsync(Guid id, CreateUserDto user)
+    public async Task<Result<UserDto>> UpdateUserAsync(Guid id, UpdateUserDto user)
     {
         try
         {
@@ -287,6 +287,158 @@ public class ApiService : IApiService
             {
                 return Result.Failure($"HTTP {response.StatusCode}: {content}");
             }
+        }
+    }
+
+    public async Task<Result> JoinEventAsync(Guid eventId, Guid userId)
+    {
+        try
+        {
+            return await TryMultipleUrlsAsync<string>($"api/events/{eventId}/participants/{userId}", async (client, url) =>
+            {
+                var response = await client.PostAsync(url, null);
+                if (response.IsSuccessStatusCode)
+                {
+                    return Result<string>.Success("Success");
+                }
+                else
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return Result<string>.Failure($"HTTP {response.StatusCode}: {content}");
+                }
+            }).ContinueWith(task => task.Result.IsSuccess ? Result.Success() : Result.Failure(task.Result.Error));
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Error joining event: {ex.Message}");
+        }
+    }
+
+    public async Task<Result> LeaveEventAsync(Guid eventId, Guid userId)
+    {
+        try
+        {
+            return await TryMultipleUrlsAsync<string>($"api/events/{eventId}/participants/{userId}", async (client, url) =>
+            {
+                var response = await client.DeleteAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    return Result<string>.Success("Success");
+                }
+                else
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return Result<string>.Failure($"HTTP {response.StatusCode}: {content}");
+                }
+            }).ContinueWith(task => task.Result.IsSuccess ? Result.Success() : Result.Failure(task.Result.Error));
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Error leaving event: {ex.Message}");
+        }
+    }
+
+    public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(loginDto, _jsonOptions);
+            var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var result = await TryMultipleUrlsAsync<AuthResponseDto>("api/auth/login", async (client, url) =>
+            {
+                var response = await client.PostAsync(url, stringContent);
+                var content = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var authResponse = JsonSerializer.Deserialize<AuthResponseDto>(content, _jsonOptions);
+                    return Result<AuthResponseDto>.Success(authResponse ?? new AuthResponseDto { IsSuccess = false, Error = "Invalid response format" });
+                }
+                else
+                {
+                    var errorResponse = JsonSerializer.Deserialize<AuthResponseDto>(content, _jsonOptions);
+                    return Result<AuthResponseDto>.Failure(errorResponse?.Error ?? $"HTTP {response.StatusCode}");
+                }
+            });
+
+            return result.IsSuccess ? result.Value! : new AuthResponseDto { IsSuccess = false, Error = result.Error };
+        }
+        catch (Exception ex)
+        {
+            return new AuthResponseDto { IsSuccess = false, Error = $"Login failed: {ex.Message}" };
+        }
+    }
+
+    public async Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(registerDto, _jsonOptions);
+            var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var result = await TryMultipleUrlsAsync<AuthResponseDto>("api/auth/register", async (client, url) =>
+            {
+                var response = await client.PostAsync(url, stringContent);
+                var content = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var authResponse = JsonSerializer.Deserialize<AuthResponseDto>(content, _jsonOptions);
+                    return Result<AuthResponseDto>.Success(authResponse ?? new AuthResponseDto { IsSuccess = false, Error = "Invalid response format" });
+                }
+                else
+                {
+                    var errorResponse = JsonSerializer.Deserialize<AuthResponseDto>(content, _jsonOptions);
+                    return Result<AuthResponseDto>.Failure(errorResponse?.Error ?? $"HTTP {response.StatusCode}");
+                }
+            });
+
+            return result.IsSuccess ? result.Value! : new AuthResponseDto { IsSuccess = false, Error = result.Error };
+        }
+        catch (Exception ex)
+        {
+            return new AuthResponseDto { IsSuccess = false, Error = $"Registration failed: {ex.Message}" };
+        }
+    }
+
+    public async Task<Result<PagedResultDto<EventDto>>> SearchEventsAsync(EventSearchDto searchDto)
+    {
+        try
+        {
+            var queryParams = $"?search={Uri.EscapeDataString(searchDto.SearchTerm ?? "")}&page={searchDto.PageNumber}&pageSize={searchDto.PageSize}";
+            
+            return await TryMultipleUrlsAsync<PagedResultDto<EventDto>>($"api/events{queryParams}", async (client, url) =>
+            {
+                var response = await client.GetAsync(url);
+                var content = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, _jsonOptions);
+                    var events = JsonSerializer.Deserialize<List<EventDto>>(
+                        apiResponse.GetProperty("events").GetRawText(), _jsonOptions) ?? new List<EventDto>();
+                    
+                    var pagination = apiResponse.GetProperty("pagination");
+                    var result = new PagedResultDto<EventDto>
+                    {
+                        Items = events,
+                        TotalCount = pagination.GetProperty("totalCount").GetInt32(),
+                        PageNumber = pagination.GetProperty("currentPage").GetInt32(),
+                        PageSize = pagination.GetProperty("pageSize").GetInt32()
+                    };
+
+                    return Result<PagedResultDto<EventDto>>.Success(result);
+                }
+                else
+                {
+                    return Result<PagedResultDto<EventDto>>.Failure($"HTTP {response.StatusCode}: {content}");
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            return Result<PagedResultDto<EventDto>>.Failure($"Error searching events: {ex.Message}");
         }
     }
 

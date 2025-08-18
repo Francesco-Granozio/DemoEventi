@@ -8,7 +8,7 @@ public interface IApiService
     Task<Result<IEnumerable<UserDto>>> GetUsersAsync();
     Task<Result<UserDto>> GetUserAsync(Guid id);
     Task<Result<UserDto>> CreateUserAsync(CreateUserDto user);
-    Task<Result<UserDto>> UpdateUserAsync(Guid id, CreateUserDto user);
+    Task<Result<UserDto>> UpdateUserAsync(Guid id, UpdateUserDto user);
     Task<Result> DeleteUserAsync(Guid id);
 
     Task<Result<IEnumerable<EventDto>>> GetEventsAsync();
@@ -18,4 +18,15 @@ public interface IApiService
     Task<Result> DeleteEventAsync(Guid id);
 
     Task<Result<IEnumerable<InterestDto>>> GetInterestsAsync();
+    
+    // Event participation
+    Task<Result> JoinEventAsync(Guid eventId, Guid userId);
+    Task<Result> LeaveEventAsync(Guid eventId, Guid userId);
+    
+    // Authentication
+    Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
+    Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto);
+    
+    // Search and pagination
+    Task<Result<PagedResultDto<EventDto>>> SearchEventsAsync(EventSearchDto searchDto);
 }

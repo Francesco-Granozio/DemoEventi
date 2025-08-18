@@ -30,10 +30,26 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
             // Update properties
             existingUser.FirstName = request.UpdateUserDto.FirstName;
             existingUser.LastName = request.UpdateUserDto.LastName;
+            existingUser.Email = request.UpdateUserDto.Email ?? existingUser.Email;
+            existingUser.ProfileImageUrl = request.UpdateUserDto.ProfileImageUrl;
             existingUser.DataOraModifica = DateTime.UtcNow;
 
-            // TODO: Handle interests update
-            // existingUser.Interests = await _unitOfWork.Interests.GetByIdsAsync(request.InterestIds);
+            // Handle interests update
+            if (request.UpdateUserDto.InterestIds != null)
+            {
+                // Clear existing interests
+                existingUser.Interests.Clear();
+                
+                // Add new interests
+                foreach (var interestId in request.UpdateUserDto.InterestIds)
+                {
+                    var interest = await _unitOfWork.Interests.GetByIdAsync(interestId);
+                    if (interest != null)
+                    {
+                        existingUser.Interests.Add(interest);
+                    }
+                }
+            }
 
             _unitOfWork.Users.Update(existingUser);
             await _unitOfWork.SaveChangesAsync();

@@ -6,7 +6,7 @@
     Title="{Binding Title}"
     BackgroundColor="{StaticResource BackgroundSecondary}">
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*,Auto">
 
         <!--  Header  -->
         <StackLayout
@@ -68,17 +68,19 @@
                 VerticalScrollBarVisibility="Never">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Style="{StaticResource CompactCardStyle}">
-                            <VerticalStackLayout Spacing="8">
+                        <Frame Style="{StaticResource CompactCardStyle}" Margin="20,5" Padding="15">
+                            <Grid ColumnDefinitions="*,Auto">
                                 <Label
+                                    Grid.Column="0"
                                     Style="{StaticResource HeadlineStyle}"
+                                    VerticalOptions="Center"
                                     Text="{Binding Name}" />
-                                <Label
-                                    Style="{StaticResource CalloutStyle}"
-                                    Text="{Binding Description}"
-                                    TextColor="{StaticResource TextSecondary}"
-                                    LineBreakMode="WordWrap" />
-                            </VerticalStackLayout>
+                                <CheckBox
+                                    Grid.Column="1"
+                                    IsChecked="{Binding IsSelected}"
+                                    Color="{StaticResource Primary}"
+                                    VerticalOptions="Center" />
+                            </Grid>
                         </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -107,6 +109,15 @@
                 </CollectionView.EmptyView>
             </CollectionView>
         </RefreshView>
+
+        <!-- Save Button -->
+        <Button
+            Grid.Row="2"
+            Text="Save My Interests" 
+            Command="{Binding SaveInterestsCommand}"
+            Style="{StaticResource PrimaryButtonStyle}"
+            Margin="20"
+            IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
 
     </Grid>
 

@@ -130,16 +130,19 @@ public partial class UserFormViewModel : BaseViewModel
                 .Select(i => i.Id)
                 .ToList();
 
-            var userDto = new CreateUserDto
-            {
-                FirstName = FirstName,
-                LastName = LastName,
-                InterestIds = selectedInterestIds
-            };
-
             var result = IsEdit
-                ? await _apiService.UpdateUserAsync(UserId, userDto)
-                : await _apiService.CreateUserAsync(userDto);
+                ? await _apiService.UpdateUserAsync(UserId, new UpdateUserDto
+                {
+                    FirstName = FirstName,
+                    LastName = LastName,
+                    InterestIds = selectedInterestIds
+                })
+                : await _apiService.CreateUserAsync(new CreateUserDto
+                {
+                    FirstName = FirstName,
+                    LastName = LastName,
+                    InterestIds = selectedInterestIds
+                });
 
             if (result.IsSuccess)
             {

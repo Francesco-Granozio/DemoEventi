@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace DemoEventi.UI.ViewModels;
 
-public abstract class BaseViewModel : ObservableObject
+public abstract class BaseViewModel : ObservableObject, IDisposable
 {
     private bool _isBusy;
     private string? _title;
@@ -45,5 +45,19 @@ public abstract class BaseViewModel : ObservableObject
     protected void ClearError()
     {
         ErrorMessage = null;
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            // Override in derived classes to dispose resources
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

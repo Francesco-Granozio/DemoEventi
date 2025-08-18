@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="{Binding Title}">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!--  Header  -->
         <HorizontalStackLayout
@@ -22,9 +22,17 @@
                 Text="Refresh" />
         </HorizontalStackLayout>
 
+        <!--  Search Bar  -->
+        <SearchBar
+            Grid.Row="1"
+            Margin="20,0,20,10"
+            Placeholder="Search events by name or location..."
+            Text="{Binding SearchText}"
+            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
+
         <!--  Error Message  -->
         <Frame
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="20,0"
             Padding="10"
             BackgroundColor="Red"
@@ -37,7 +45,7 @@
 
         <!--  Loading Indicator  -->
         <ActivityIndicator
-            Grid.Row="1"
+            Grid.Row="2"
             HorizontalOptions="Center"
             IsRunning="{Binding IsBusy}"
             IsVisible="{Binding IsBusy}"
@@ -45,47 +53,75 @@
 
         <!--  Events List  -->
         <RefreshView
-            Grid.Row="1"
+            Grid.Row="2"
             Command="{Binding RefreshCommand}"
             IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
-            <CollectionView ItemsSource="{Binding Events}">
+            <CollectionView ItemsSource="{Binding Events}"
+                            RemainingItemsThreshold="2"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreEventsCommand}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Margin="10,5" Padding="15">
-                            <Grid ColumnDefinitions="*,Auto,Auto">
-                                <VerticalStackLayout Grid.Column="0" Spacing="5">
+                        <Frame Margin="10,5" Padding="15" Style="{StaticResource CardFrameStyle}">
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*">
+                                <!-- Event Info -->
+                                <VerticalStackLayout Grid.Row="0" Spacing="5">
                                     <Label
                                         FontAttributes="Bold"
                                         FontSize="18"
-                                        Text="{Binding Name}" />
+                                        Text="{Binding Name}" 
+                                        Style="{StaticResource SubheadingLabelStyle}" />
                                     <Label
                                         FontSize="14"
                                         Text="{Binding Location}"
-                                        TextColor="Gray" />
+                                        Style="{StaticResource BodyLabelStyle}" />
                                     <Label
                                         FontSize="14"
                                         Text="{Binding StartDate, StringFormat='{0:g}'}"
-                                        TextColor="Gray" />
-                                    <Label
-                                        FontSize="12"
-                                        Text="{Binding ParticipantCount, StringFormat='{0} participants'}"
-                                        TextColor="Blue" />
+                                        Style="{StaticResource BodyLabelStyle}" />
                                 </VerticalStackLayout>
 
-                                <Button
-                                    Grid.Column="1"
-                                    Margin="10,0,5,0"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditEventCommand}"
-                                    CommandParameter="{Binding}"
-                                    Text="Edit" />
+                                <!-- Participant Info -->
+                                <Grid Grid.Row="1" Margin="0,10,0,0" ColumnDefinitions="*,Auto">
+                                    <Label
+                                        Grid.Column="0"
+                                        FontSize="12"
+                                        Text="{Binding ParticipantCountText}"
+                                        TextColor="{StaticResource Primary}"
+                                        VerticalOptions="Center" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Text="View"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ViewParticipantsCommand}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource CompactButtonStyle}" />
+                                </Grid>
 
-                                <Button
-                                    Grid.Column="2"
-                                    Margin="5,0,0,0"
-                                    BackgroundColor="Red"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteEventCommand}"
-                                    CommandParameter="{Binding}"
-                                    Text="Delete" />
+                                <!-- Action Buttons -->
+                                <Grid Grid.Row="2" Margin="0,10,0,0" ColumnDefinitions="*,Auto,Auto,Auto">
+                                    <!-- Join/Leave Button (simplified) -->
+                                    <Button
+                                        Grid.Column="0"
+                                        Text="Join"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.JoinEventCommand}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource PrimaryButtonStyle}" />
+
+                                    <Button
+                                        Grid.Column="1"
+                                        Margin="10,0,5,0"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditEventCommand}"
+                                        CommandParameter="{Binding}"
+                                        Text="Edit" 
+                                        Style="{StaticResource SecondaryButtonStyle}" />
+
+                                    <Button
+                                        Grid.Column="2"
+                                        Margin="5,0,0,0"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteEventCommand}"
+                                        CommandParameter="{Binding}"
+                                        Text="Delete"
+                                        Style="{StaticResource DangerButtonStyle}" />
+                                </Grid>
                             </Grid>
                         </Frame>
                     </DataTemplate>
@@ -102,6 +138,20 @@
                             Text="Create First Event" />
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
+                <CollectionView.Footer>
+                    <StackLayout IsVisible="{Binding IsLoadingMore}" 
+                                 Padding="20"
+                                 HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="{Binding IsLoadingMore}" 
+                                           Color="{StaticResource Primary}"
+                                           WidthRequest="30"
+                                           HeightRequest="30" />
+                        <Label Text="Loading more events..." 
+                               Style="{StaticResource BodyLabelStyle}"
+                               HorizontalOptions="Center"
+                               Margin="0,10,0,0" />
+                    </StackLayout>
+                </CollectionView.Footer>
             </CollectionView>
         </RefreshView>
 

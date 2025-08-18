@@ -17,21 +17,14 @@
         <!-- Tab styling removed due to property limitations -->
     </Shell.Resources>
 
-    <TabBar>
-        <Tab Title="Home" Icon="home_icon">
-            <ShellContent
-                Title="Home"
-                ContentTemplate="{DataTemplate views:HomePage}"
-                Route="HomePage" />
-        </Tab>
-        
-        <Tab Title="Search" Icon="search_icon">
-            <ShellContent
-                Title="Search"
-                ContentTemplate="{DataTemplate views:UsersPage}"
-                Route="SearchPage" />
-        </Tab>
-        
+    <!-- Login Shell - Initial State -->
+    <ShellContent x:Name="LoginShell"
+                  Title="Login"
+                  ContentTemplate="{DataTemplate views:LoginPage}"
+                  Route="LoginPage" />
+
+    <!-- Main App Shell - Hidden initially -->
+    <TabBar x:Name="MainTabBar" IsVisible="False">
         <Tab Title="Events" Icon="events_icon">
             <ShellContent
                 Title="Events"
@@ -49,7 +42,7 @@
         <Tab Title="Profile" Icon="users_icon">
             <ShellContent
                 Title="Profile"
-                ContentTemplate="{DataTemplate views:UsersPage}"
+                ContentTemplate="{DataTemplate views:ProfilePage}"
                 Route="ProfilePage" />
         </Tab>
     </TabBar>

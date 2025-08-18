@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="DemoEventi.UI.Views.ProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:DemoEventi.UI.ViewModels"
+    Title="{Binding Title}"
+    x:DataType="viewmodels:ProfileViewModel">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+
+            <!--  Profile Image Section  -->
+            <Frame
+                BackgroundColor="Transparent"
+                BorderColor="{AppThemeBinding Light={StaticResource Primary},
+                                              Dark={StaticResource PrimaryDarkText}}"
+                CornerRadius="60"
+                HeightRequest="120"
+                HorizontalOptions="Center"
+                WidthRequest="120">
+                <Image
+                    Aspect="AspectFill"
+                    BackgroundColor="LightGray"
+                    Source="{Binding ProfileImageUrl, FallbackValue='dotnet_bot.png'}" />
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ChangeProfileImageCommand}" />
+                </Frame.GestureRecognizers>
+            </Frame>
+
+            <!--  Change Photo Button  -->
+            <Button
+                Command="{Binding ChangeProfileImageCommand}"
+                HorizontalOptions="Center"
+                Style="{StaticResource SecondaryButtonStyle}"
+                Text="Change Photo" />
+
+            <!--  User Info Section  -->
+            <Frame Style="{StaticResource CardFrameStyle}">
+                <StackLayout Spacing="15">
+                    <Label Style="{StaticResource SubheadingLabelStyle}" Text="Personal Information" />
+
+                    <!--  First Name  -->
+                    <StackLayout>
+                        <Label Style="{StaticResource BodyLabelStyle}" Text="First Name" />
+                        <Entry
+                            Placeholder="Enter your first name"
+                            Style="{StaticResource EntryStyle}"
+                            Text="{Binding FirstName}" />
+                    </StackLayout>
+
+                    <!--  Last Name  -->
+                    <StackLayout>
+                        <Label Style="{StaticResource BodyLabelStyle}" Text="Last Name" />
+                        <Entry
+                            Placeholder="Enter your last name"
+                            Style="{StaticResource EntryStyle}"
+                            Text="{Binding LastName}" />
+                    </StackLayout>
+
+                    <!--  Email  -->
+                    <StackLayout>
+                        <Label Style="{StaticResource BodyLabelStyle}" Text="Email" />
+                        <Entry
+                            Keyboard="Email"
+                            Placeholder="Enter your email"
+                            Style="{StaticResource EntryStyle}"
+                            Text="{Binding Email}" />
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!--  My Interests Section  -->
+            <Frame Style="{StaticResource CardFrameStyle}">
+                <StackLayout Spacing="15">
+                    <Label Style="{StaticResource SubheadingLabelStyle}" Text="My Interests" />
+
+                    <Button
+                        Command="{Binding ManageInterestsCommand}"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Text="Manage Interests" />
+
+                    <CollectionView IsVisible="{Binding UserInterests.Count, Converter={StaticResource CountToVisibilityConverter}}" ItemsSource="{Binding UserInterests}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="10,5">
+                                    <Label Style="{StaticResource BodyLabelStyle}" Text="{Binding Name}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </Frame>
+
+            <!--  Save Button  -->
+            <Button
+                Command="{Binding SaveCommand}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                Style="{StaticResource PrimaryButtonStyle}"
+                Text="Save Changes" />
+
+            <!--  Logout Button  -->
+            <Button
+                Command="{Binding LogoutCommand}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                Style="{StaticResource DangerButtonStyle}"
+                Text="Logout" />
+
+            <!--  Error Message  -->
+            <Label
+                IsVisible="{Binding HasError}"
+                Style="{StaticResource ErrorLabelStyle}"
+                Text="{Binding ErrorMessage}" />
+
+            <!--  Loading Indicator  -->
+            <ActivityIndicator
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="{AppThemeBinding Light={StaticResource Primary},
+                                        Dark={StaticResource PrimaryDarkText}}" />
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>
